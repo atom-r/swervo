@@ -23,7 +23,6 @@ At a minimum, players will be able to:
 
 In addition, this project will include:
 
-- [ ] An About modal describing the background and rules of the game
 - [ ] A production README
 
 ### Wireframes
@@ -63,7 +62,7 @@ In addition to the webpack entry file, there will be three scripts involved in t
 - Complete 'computer_player.js'
 - Add 'spin', including proper response as a spinning ball deflects off a wall (Note: ball speed along the corridor will be constant, regardless of spin)
 
-**Day 4**: Add scoring, start screen, about modal, and complete styling around the game display.
+**Day 4**: Add scoring, start screen, and complete styling around the game display.
 
 
 ### Bonus features
