@@ -4,7 +4,7 @@
 
 Swervo is a JavaScript remake of Curveball, a Flash creation from the early 2000s, which itself was a take on the arcade classic Pong. Curveball features a 3-D corridor (though players' paddles move only in 2-D) and allows players to put spin on the ball, curving it down the corridor toward the opponent's goal.
 
-As in the original, the game will be built for one player, who will use a mouse to control a paddle at the near end the corridor. Should the ball land on the surface 'behind' the human player, he/she will receive a strike. If the computer puts 3 strikes by you, you're out.
+As in the original, the game will be built for one player, who will use a mouse to control a paddle at the near end of the corridor. Should the ball land on the surface 'behind' the human player, he/she will receive a strike. If the computer puts 3 strikes by you, you're out.
 
 The ball will have an angular velocity variable ('spin') which will determine the strength of the curve. The magnitude and direction of the ball's spin will be determined whenever the ball contacts a paddle. That is, if the paddle is moving directly 'up' at when the ball makes contact, the ball will receive a topwise spin velocity proportional to the speed at which the paddle was moving.
 
@@ -68,6 +68,5 @@ In addition to the webpack entry file, there will be three scripts involved in t
 
 ### Bonus features
 
-There are many directions this cellular automata engine could eventually go.  Some anticipated updates are:
-
 - [ ] Ascending difficulty levels and altered scoring system, allowing the player 5 total strikes
+- [ ] Accompanying 8-bit soundtrack with mute capability
