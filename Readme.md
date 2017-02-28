@@ -1,4 +1,4 @@
-## Swervo - 3D Pong - With Curveball Action
+## Swervo - A game of 3D Curve Pong
 
 ### Background
 
@@ -31,7 +31,7 @@ In addition, this project will include:
 This app will consist of a single screen with game board, and nav links to Github, LinkedIn,
 and the About modal.  The player will click 'Start' on the main screen to load the corridor, paddles, and ball. The ball starts in front of the human player, who will click to initiate action.
 
-![wireframes](https://github.com/atom-r/)
+![wireframes](https://github.com/atom-r/swervo/blob/master/swervo.png)
 
 ### Architecture and Technologies
 
