@@ -2,7 +2,7 @@
 
 CENTER_X = 400;
 CENTER_Y = 300;
-MAX_DISTANCE = 150;
+MAX_DISTANCE = 80;
 
 const init = () => {
   const stage = new createjs.Stage("myCanvas");
@@ -22,18 +22,47 @@ const init = () => {
 
   ball.direction = "out";
   ball.distance = 0;
-  ball.xVelocity = 5;
-  ball.yVelocity = 0;
+  ball.xVelocity = 2;
+  ball.yVelocity = -2;
 
-  stage.update();
+  const ballMarker = new createjs.Shape();
+  drawBallMarker(stage, ballMarker);
 
-  hitBall(ball, stage);
+  setStage(ball, stage, ballMarker);
 
 };
 
-const hitBall = (ball, stage) => {
-  createjs.Ticker.addEventListener('tick', scaleBall);
-  createjs.Ticker.setFPS(60);
+const drawBallMarker = (stage, ballMarker) => {
+  ballMarker.graphics.beginStroke("#32CD32");
+  ballMarker.graphics.setStrokeStyle(1);
+  ballMarker.snapToPixel = true;
+  ballMarker.graphics.drawRect(88, 91, 624, 418);
+
+  stage.addChild(ballMarker);
+};
+
+const setStage = (ball, stage, ballMarker) => {
+  ball.x = 400;
+  ball.y = 300;
+  stage.on('stagemousedown', hitBall(ball, stage, ballMarker));
+};
+
+
+const hitBall = (ball, stage, ballMarker) => () => {
+  const ticker = createjs.Ticker;
+  ticker.addEventListener('tick', scaleBall);
+  ticker.setFPS(60);
+
+  function detectHit() {
+    if (ball.x - (ball.radius - 10) <= stage.getChildByName('humanPaddle').x + 120
+        && ball.x + (ball.radius - 10) >= stage.getChildByName('humanPaddle').x
+        && ball.y - (ball.radius - 10) <= stage.getChildByName('humanPaddle').y + 60
+        && ball.y + (ball.radius - 10) >= stage.getChildByName('humanPaddle').y) {
+      console.log(`hit!`);
+    } else {
+      ticker.removeEventListener('tick', scaleBall);
+    }
+  }
 
   function scaleBall() {
     if (ball.direction === "out"){
@@ -45,14 +74,21 @@ const hitBall = (ball, stage) => {
     if (ball.distance === MAX_DISTANCE){
       ball.direction = "in";
     } else if (ball.distance === 0){
+      detectHit();
       ball.direction = "out";
     }
+
+    const markerX = 88 + ball.distance * (321 - 88) / MAX_DISTANCE;
+    const markerY = 91 + ball.distance * (247 - 91) / MAX_DISTANCE;
+    const markerW = 624 - ball.distance * (624 - 158) / MAX_DISTANCE;
+    const markerH = 418 - ball.distance * (418 - 106) / MAX_DISTANCE;
+    ballMarker.graphics.clear().beginStroke("#32CD32").drawRect(markerX, markerY, markerW, markerH);
 
     ball.scaleX = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
     ball.scaleY = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
 
-    // ball.scaleX = 1/(1 + ball.distance/26.7);
-    // ball.scaleY = 1/(1 + ball.distance/26.7);
+    // ball.scaleX = 1/(1 + ball.distance * 3 / MAX_DISTANCE);
+    // ball.scaleY = 1/(1 + ball.distance * 3 / MAX_DISTANCE);
 
     ball.radius = 35 * ball.scaleX;
 
@@ -154,12 +190,14 @@ const renderPaddles = stage => {
   humanPaddle.graphics.setStrokeStyle(4);
   humanPaddle.snapToPixel = true;
   humanPaddle.graphics.drawRoundRect(0, 0, 120, 80, 10);
+  humanPaddle.name = 'humanPaddle';
 
   let cpuPaddle = new createjs.Shape();
   cpuPaddle.graphics.beginStroke("#92140C");
   cpuPaddle.graphics.setStrokeStyle(2);
   cpuPaddle.snapToPixel = true;
   cpuPaddle.graphics.drawRoundRect(330, 300, 30, 20, 3);
+  cpuPaddle.name = 'cpuPaddle';
 
   stage.addChild(cpuPaddle);
   stage.addChild(humanPaddle);
