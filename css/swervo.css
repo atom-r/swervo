@@ -1,0 +1,10 @@
+@background: #1E1E24;
+@human: #111D4A;
+@borders: #FFF8F0;
+@ball: #FFCF99;
+@opponent: #92140C;
+
+#myCanvas {
+  border: 1px solid black;
+  background-color: #1E1E24;
+}
