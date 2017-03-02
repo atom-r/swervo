@@ -2,7 +2,7 @@
 
 CENTER_X = 400;
 CENTER_Y = 300;
-MAX_DISTANCE = 80;
+MAX_DISTANCE = 150;
 
 const init = () => {
   const stage = new createjs.Stage("myCanvas");
@@ -10,10 +10,10 @@ const init = () => {
   const ball = new createjs.Shape();
   ball.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 35);
 
-  ball.rawX = 500;
+  ball.rawX = 400;
   ball.farX = (ball.rawX - 400) * 79/312 + 400;
 
-  ball.rawY = 400;
+  ball.rawY = 300;
   ball.farY = (ball.rawY - 300) * 53/209 + 300;
 
   renderCorridor(stage);
@@ -22,6 +22,8 @@ const init = () => {
 
   ball.direction = "out";
   ball.distance = 0;
+  ball.xVelocity = 5;
+  ball.yVelocity = 0;
 
   stage.update();
 
@@ -46,8 +48,11 @@ const hitBall = (ball, stage) => {
       ball.direction = "out";
     }
 
-    ball.scaleX = 1 - ball.distance/107;
-    ball.scaleY = 1 - ball.distance/107;
+    ball.scaleX = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
+    ball.scaleY = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
+
+    // ball.scaleX = 1/(1 + ball.distance/26.7);
+    // ball.scaleY = 1/(1 + ball.distance/26.7);
 
     ball.radius = 35 * ball.scaleX;
 
@@ -57,12 +62,34 @@ const hitBall = (ball, stage) => {
     //furthest box right bound x = 479, left bound x = 321
     //            top boundy = 353, bottom bound y = 247
 
-    //    ball.x at the front - ball.x at the back
-    // 712 - (712 - 479)/80 * ball.distance - ball.radius
+    ball.rawX += ball.xVelocity;
+    ball.farX = (ball.rawX - 400) * 79/312 + 400;
 
+    if(ball.rawX >= 712 || ball.rawX <= 88){
+      ball.xVelocity = ball.xVelocity * -1;
+    }
+
+    ball.rawY += ball.yVelocity;
+    ball.farY = (ball.rawY - 300) * 53/209 + 300;
+
+    if(ball.rawY >= 509 || ball.rawY <= 91){
+      ball.yVelocity = ball.yVelocity * -1;
+    }
 
     ball.x = ball.rawX - (ball.rawX - ball.farX) * ball.distance / MAX_DISTANCE;
     ball.y = ball.rawY - (ball.rawY - ball.farY) * ball.distance / MAX_DISTANCE;
+
+    if (ball.rawX > 400) {
+      ball.x -= ball.radius * (ball.rawX - 400)/312;
+    } else if (ball.rawX < 400) {
+      ball.x += ball.radius * (400 - ball.rawX)/312;
+    }
+
+    if (ball.rawY > 300) {
+      ball.y -= ball.radius * (ball.rawY - 300)/209;
+    } else if (ball.rawY < 300) {
+      ball.y += ball.radius * (300 - ball.rawY)/209;
+    }
 
     stage.update();
   }
