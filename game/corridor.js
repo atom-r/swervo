@@ -9,26 +9,16 @@ const init = () => {
 
   const ball = new createjs.Shape();
   ball.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 35);
-
-  ball.rawX = 400;
-  ball.farX = (ball.rawX - 400) * 79/312 + 400;
-
-  ball.rawY = 300;
-  ball.farY = (ball.rawY - 300) * 53/209 + 300;
+  ball.name = "ball";
 
   renderCorridor(stage);
   stage.addChild(ball);
   renderPaddles(stage);
 
-  ball.direction = "out";
-  ball.distance = 0;
-  ball.xVelocity = 2;
-  ball.yVelocity = -2;
-
   const ballMarker = new createjs.Shape();
   drawBallMarker(stage, ballMarker);
 
-  setStage(ball, stage, ballMarker);
+  setStage(ball, stage, ballMarker)();
 
 };
 
@@ -41,26 +31,60 @@ const drawBallMarker = (stage, ballMarker) => {
   stage.addChild(ballMarker);
 };
 
-const setStage = (ball, stage, ballMarker) => {
+const setStage = (ball, stage, ballMarker) => () => {
   ball.x = 400;
   ball.y = 300;
+  ball.rawX = 400;
+  ball.rawY = 300;
+  ball.xVelocity = 0;
+  ball.yVelocity = 0;
+  ball.direction = "out";
+  ball.distance = 0;
+  ball.scaleX = 1;
+  ball.scaleY = 1;
+  ball.xSpin = 0;
+  ball.ySpin = 0;
   stage.on('stagemousedown', hitBall(ball, stage, ballMarker));
 };
 
 
-const hitBall = (ball, stage, ballMarker) => () => {
+const hitBall = (ball, stage, ballMarker) => (e) => {
+  e.remove();
+  const humanPaddle = stage.getChildByName('humanPaddle');
+  const cpuPaddle = stage.getChildByName('cpuPaddle');
+
+  ball.xSpin += humanPaddle.x - humanPaddle.prevX;
+  ball.ySpin += humanPaddle.y - humanPaddle.prevY;
+
   const ticker = createjs.Ticker;
   ticker.addEventListener('tick', scaleBall);
   ticker.setFPS(60);
 
-  function detectHit() {
-    if (ball.x - (ball.radius - 10) <= stage.getChildByName('humanPaddle').x + 120
-        && ball.x + (ball.radius - 10) >= stage.getChildByName('humanPaddle').x
-        && ball.y - (ball.radius - 10) <= stage.getChildByName('humanPaddle').y + 60
-        && ball.y + (ball.radius - 10) >= stage.getChildByName('humanPaddle').y) {
-      console.log(`hit!`);
+
+  function detectHumanHit() {
+    if (ball.x - (ball.radius - 10) <= humanPaddle.x + 120
+        && ball.x + (ball.radius - 10) >= humanPaddle.x
+        && ball.y - (ball.radius - 10) <= humanPaddle.y + 60
+        && ball.y + (ball.radius - 10) >= humanPaddle.y) {
+      console.log(`${humanPaddle.x}, ${humanPaddle.prevX}`);
+      ball.xSpin += humanPaddle.x - humanPaddle.prevX;
+      ball.ySpin += humanPaddle.y - humanPaddle.prevY;
     } else {
       ticker.removeEventListener('tick', scaleBall);
+      setTimeout(setStage(ball, stage, ballMarker), 1000);
+    }
+  }
+
+  function detectCpuHit() {
+
+    if (ball.x - 400 - (ball.radius - 2) <= cpuPaddle.x + 15
+        && ball.x - 400 + (ball.radius - 2) >= cpuPaddle.x - 15
+        && ball.y - 300 - (ball.radius - 2) <= cpuPaddle.y + 10
+        && ball.y - 300 + (ball.radius - 2) >= cpuPaddle.y - 10) {
+      console.log(`cpu hit!`);
+    } else {
+      ticker.removeEventListener('tick', scaleBall);
+      setTimeout(setStage(ball, stage, ballMarker), 1000);
     }
   }
 
@@ -72,9 +96,10 @@ const hitBall = (ball, stage, ballMarker) => () => {
     }
 
     if (ball.distance === MAX_DISTANCE){
+      detectCpuHit();
       ball.direction = "in";
     } else if (ball.distance === 0){
-      detectHit();
+      detectHumanHit();
       ball.direction = "out";
     }
 
@@ -87,9 +112,6 @@ const hitBall = (ball, stage, ballMarker) => () => {
     ball.scaleX = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
     ball.scaleY = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
 
-    // ball.scaleX = 1/(1 + ball.distance * 3 / MAX_DISTANCE);
-    // ball.scaleY = 1/(1 + ball.distance * 3 / MAX_DISTANCE);
-
     ball.radius = 35 * ball.scaleX;
 
     //closest box right bound x = 712, left bound x = 88
@@ -98,11 +120,15 @@ const hitBall = (ball, stage, ballMarker) => () => {
     //furthest box right bound x = 479, left bound x = 321
     //            top boundy = 353, bottom bound y = 247
 
+    ball.xVelocity -= ball.xSpin / MAX_DISTANCE;
+    ball.yVelocity -= ball.ySpin / MAX_DISTANCE;
+
     ball.rawX += ball.xVelocity;
     ball.farX = (ball.rawX - 400) * 79/312 + 400;
 
     if(ball.rawX >= 712 || ball.rawX <= 88){
       ball.xVelocity = ball.xVelocity * -1;
+      ball.xSpin = 0;
     }
 
     ball.rawY += ball.yVelocity;
@@ -110,6 +136,7 @@ const hitBall = (ball, stage, ballMarker) => () => {
 
     if(ball.rawY >= 509 || ball.rawY <= 91){
       ball.yVelocity = ball.yVelocity * -1;
+      ball.ySpin = 0;
     }
 
     ball.x = ball.rawX - (ball.rawX - ball.farX) * ball.distance / MAX_DISTANCE;
@@ -126,6 +153,8 @@ const hitBall = (ball, stage, ballMarker) => () => {
     } else if (ball.rawY < 300) {
       ball.y += ball.radius * (300 - ball.rawY)/209;
     }
+
+    // const cpuPaddle = stage.getChildByName('cpuPaddle');
 
     stage.update();
   }
@@ -191,21 +220,27 @@ const renderPaddles = stage => {
   humanPaddle.snapToPixel = true;
   humanPaddle.graphics.drawRoundRect(0, 0, 120, 80, 10);
   humanPaddle.name = 'humanPaddle';
+  humanPaddle.prevX = 0;
+  humanPaddle.prevY = 0;
 
   let cpuPaddle = new createjs.Shape();
   cpuPaddle.graphics.beginStroke("#92140C");
   cpuPaddle.graphics.setStrokeStyle(2);
   cpuPaddle.snapToPixel = true;
-  cpuPaddle.graphics.drawRoundRect(330, 300, 30, 20, 3);
+  cpuPaddle.graphics.drawRoundRect(385, 290, 30, 20, 3);
   cpuPaddle.name = 'cpuPaddle';
+  cpuPaddle.rawX = 0;
+  cpuPaddle.rawY = 0;
+  cpuPaddle.prevRawX = 0;
+  cpuPaddle.prevRawY = 0;
 
   stage.addChild(cpuPaddle);
   stage.addChild(humanPaddle);
 
-  createjs.Ticker.addEventListener('tick', cursor);
+  createjs.Ticker.addEventListener('tick', movePaddles);
   createjs.Ticker.setFPS(60);
 
-  function cursor(event){
+  function movePaddles(event){
     let difX;
     let difY;
 
@@ -225,7 +260,32 @@ const renderPaddles = stage => {
       difY = 469 - humanPaddle.y - 40;
     }
 
+    const ball = stage.getChildByName('ball');
+    cpuDifX = ball.rawX - 400 - cpuPaddle.rawX;
+    cpuDifY = ball.rawY - 300 - cpuPaddle.rawY;
 
+
+    cpuPaddle.prevX = cpuPaddle.rawX;
+    cpuPaddle.prevY = cpuPaddle.rawY;
+    cpuPaddle.rawX += cpuDifX/10;
+    if (cpuPaddle.rawX > 249){
+      cpuPaddle.rawX = 249;
+    } else if (cpuPaddle.rawX < -241) {
+      cpuPaddle.rawX = -241;
+    }
+
+    cpuPaddle.rawY += cpuDifY/10;
+    if (cpuPaddle.rawY > 161){
+      cpuPaddle.rawY = 161;
+    } else if (cpuPaddle.rawY < -161) {
+      cpuPaddle.rawY = -161;
+    }
+
+    cpuPaddle.x = cpuPaddle.rawX * 79/312;
+    cpuPaddle.y = cpuPaddle.rawY * 53/209;
+
+    humanPaddle.prevX = humanPaddle.x;
+    humanPaddle.prevY = humanPaddle.y;
     humanPaddle.x += difX/1.2;
     humanPaddle.y += difY/1.2;
     stage.update();
