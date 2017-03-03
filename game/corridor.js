@@ -6,8 +6,32 @@ class Corridor {
 
   constructor(stage) {
     this.stage = stage;
+    this.ticker = createjs.Ticker;
+    this.ticker.setFPS(60);
+
     this.renderCorridor();
     this.renderPieces();
+
+    this.setStage();
+  }
+
+  drawRectangle(shape, { x, y, w, h }) {
+    shape.graphics.beginStroke("#FFF8F0");
+    shape.graphics.setStrokeStyle(1);
+    shape.snapToPixel = true;
+    shape.graphics.drawRect(x, y, w, h);
+
+    this.stage.addChild(shape);
+  }
+
+  drawCorner(shape, { mtx, mty, ltx, lty }) {
+    shape.graphics.beginStroke("#FFF8F0");
+    shape.graphics.setStrokeStyle(1);
+    shape.snapToPixel = true;
+    shape.graphics.moveTo(mtx, mty);
+    shape.graphics.lineTo(ltx, lty);
+
+    this.stage.addChild(shape);
   }
 
   buildHumanPaddle() {
@@ -50,8 +74,21 @@ class Corridor {
       .drawCircle(0, 0, 35);
     ball.name = "ball";
 
+    this.drawBallMarker();
     this.stage.addChild(ball);
   }
+
+  drawBallMarker() {
+    const ballMarker = new createjs.Shape();
+
+    ballMarker.graphics.beginStroke("#32CD32");
+    ballMarker.graphics.setStrokeStyle(1);
+    ballMarker.snapToPixel = true;
+    ballMarker.graphics.drawRect(88, 91, 624, 418);
+    ballMarker.name = 'ballMarker';
+
+    this.stage.addChild(ballMarker);
+  };
 
   moveHumanPaddle() {
     const humanPaddle = this.stage.getChildByName('humanPaddle');
@@ -113,13 +150,11 @@ class Corridor {
   }
 
   renderPieces() {
-    debugger
     this.buildCpuPaddle();
     this.buildBall();
     this.buildHumanPaddle();
 
-    createjs.Ticker.addEventListener('tick', this.movePaddles.bind(this));
-    createjs.Ticker.setFPS(60);
+    this.ticker.addEventListener('tick', this.movePaddles.bind(this));
   }
 
   renderCorridor() {
@@ -133,156 +168,153 @@ class Corridor {
     const border8 = new createjs.Shape();
     const border9 = new createjs.Shape();
 
-    drawRectangle(this.stage, border1, { x: 88, y: 91, w: 624, h: 418 });
-    drawRectangle(this.stage, border2, { x: 146, y: 130, w: 508, h: 340 });
-    drawRectangle(this.stage, border3, { x: 195, y: 162, w: 410, h: 276 });
-    drawRectangle(this.stage, border4, { x: 234, y: 190, w: 332, h: 221 });
-    drawRectangle(this.stage, border5, { x: 263, y: 208, w: 275, h: 184 });
-    drawRectangle(this.stage, border6, { x: 283, y: 222, w: 234, h: 157 });
-    drawRectangle(this.stage, border7, { x: 299, y: 233, w: 202, h: 135 });
-    drawRectangle(this.stage, border8, { x: 312, y: 240, w: 176, h: 120 });
-    drawRectangle(this.stage, border9, { x: 322, y: 247, w: 158, h: 106 });
+    this.drawRectangle(border1, { x: 88, y: 91, w: 624, h: 418 });
+    this.drawRectangle(border2, { x: 146, y: 130, w: 508, h: 340 });
+    this.drawRectangle(border3, { x: 195, y: 162, w: 410, h: 276 });
+    this.drawRectangle(border4, { x: 234, y: 190, w: 332, h: 221 });
+    this.drawRectangle(border5, { x: 263, y: 208, w: 275, h: 184 });
+    this.drawRectangle(border6, { x: 283, y: 222, w: 234, h: 157 });
+    this.drawRectangle(border7, { x: 299, y: 233, w: 202, h: 135 });
+    this.drawRectangle(border8, { x: 312, y: 240, w: 176, h: 120 });
+    this.drawRectangle(border9, { x: 322, y: 247, w: 158, h: 106 });
 
     let cornerNW = new createjs.Shape();
     let cornerNE = new createjs.Shape();
     let cornerSE = new createjs.Shape();
     let cornerSW = new createjs.Shape();
 
-    drawCorner(this.stage, cornerNW, { mtx: 88, mty: 91, ltx: 322, lty: 247 });
-    drawCorner(this.stage, cornerNW, { mtx: 712, mty: 91, ltx: 479, lty: 247 });
-    drawCorner(this.stage, cornerNW, { mtx: 712, mty: 509, ltx: 479, lty: 353 });
-    drawCorner(this.stage, cornerNW, { mtx: 88, mty: 509, ltx: 322, lty: 353 });
+    this.drawCorner(cornerNW, { mtx: 88, mty: 91, ltx: 322, lty: 247 });
+    this.drawCorner(cornerNW, { mtx: 712, mty: 91, ltx: 479, lty: 247 });
+    this.drawCorner(cornerNW, { mtx: 712, mty: 509, ltx: 479, lty: 353 });
+    this.drawCorner(cornerNW, { mtx: 88, mty: 509, ltx: 322, lty: 353 });
 
+    this.stage.update();
   }
 
-}
+  setStage() {
+    /*
+      rawX and rawY represent the ball's position as it would appear if it were at a distance of zero.
+      farX and farY represent the ball's position as it would appear if it were at the max distance.
+      ---
+      both must be used, along with the ball's current distance, to render the ball properly in 3D
+      ---
+      the raw and far positions essentially comprise the endpoints of a sloped line.
+      the ball's distance determines where on that line to place the ball.
+      ---
+    */
+    const ball = this.stage.getChildByName('ball');
+    const ballMarker = this.stage.getChildByName('ballMarker');
+    ball.x = 400;
+    ball.y = 300;
+    ball.rawX = 400;
+    ball.rawY = 300;
+    ball.xVelocity = 0;
+    ball.yVelocity = 0;
+    ball.direction = "out";
+    ball.distance = 0;
+    ball.scaleX = 1;
+    ball.scaleY = 1;
+    ball.xSpin = 0;
+    ball.ySpin = 0;
+    ballMarker.graphics.clear().beginStroke("#32CD32").drawRect(88, 91, 624, 418);
+    this.stage.on('stagemousedown', this.hitBall.bind(this));
+  }
 
-const init = () => {
-  const stage = new createjs.Stage("myCanvas");
-
-  let corridor = new Corridor(stage);
-
-  const ballMarker = new createjs.Shape();
-  drawBallMarker(stage, ballMarker);
-
-  setStage(stage.getChildByName('ball'), stage, ballMarker)();
-
-};
-
-const drawBallMarker = (stage, ballMarker) => {
-  ballMarker.graphics.beginStroke("#32CD32");
-  ballMarker.graphics.setStrokeStyle(1);
-  ballMarker.snapToPixel = true;
-  ballMarker.graphics.drawRect(88, 91, 624, 418);
-
-  stage.addChild(ballMarker);
-};
-
-const setStage = (ball, stage, ballMarker) => () => {
-  ball.x = 400;
-  ball.y = 300;
-  ball.rawX = 400;
-  ball.rawY = 300;
-  ball.xVelocity = 0;
-  ball.yVelocity = 0;
-  ball.direction = "out";
-  ball.distance = 0;
-  ball.scaleX = 1;
-  ball.scaleY = 1;
-  ball.xSpin = 0;
-  ball.ySpin = 0;
-  stage.on('stagemousedown', hitBall(ball, stage, ballMarker));
-};
-
-
-const hitBall = (ball, stage, ballMarker) => (e) => {
-  e.remove();
-  const humanPaddle = stage.getChildByName('humanPaddle');
-  const cpuPaddle = stage.getChildByName('cpuPaddle');
-
-  ball.xSpin += humanPaddle.x - humanPaddle.prevX;
-  ball.ySpin += humanPaddle.y - humanPaddle.prevY;
-
-  const ticker = createjs.Ticker;
-  ticker.addEventListener('tick', scaleBall);
-  ticker.setFPS(60);
-
-
-  function detectHumanHit() {
+  detectHumanHit() {
+    const ball = this.stage.getChildByName('ball');
+    const humanPaddle = this.stage.getChildByName('humanPaddle');
     if (ball.x - (ball.radius) <= humanPaddle.x + 120
         && ball.x + (ball.radius) >= humanPaddle.x
         && ball.y - (ball.radius) <= humanPaddle.y + 60
         && ball.y + (ball.radius) >= humanPaddle.y) {
-      console.log(`${humanPaddle.x}, ${humanPaddle.prevX}`);
-      ball.xSpin += humanPaddle.x - humanPaddle.prevX;
-      ball.ySpin += humanPaddle.y - humanPaddle.prevY;
+      this.getSpin();
     } else {
-      ticker.removeEventListener('tick', scaleBall);
-      setTimeout(setStage(ball, stage, ballMarker), 1000);
+      this.ticker.removeAllEventListeners('tick');
+      this.ticker.addEventListener('tick', this.movePaddles.bind(this));
+      setTimeout(this.setStage.bind(this), 1000);
     }
   }
 
-  function detectCpuHit() {
+  getSpin() {
+    const ball = this.stage.getChildByName('ball');
+    const humanPaddle = this.stage.getChildByName('humanPaddle');
+    ball.xSpin += humanPaddle.x - humanPaddle.prevX;
+    ball.ySpin += humanPaddle.y - humanPaddle.prevY;
+  }
 
+  detectCpuHit() {
+    const ball = this.stage.getChildByName('ball');
+    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
     if (ball.x - 400 - (ball.radius - 2) <= cpuPaddle.x + 15
         && ball.x - 400 + (ball.radius - 2) >= cpuPaddle.x - 15
         && ball.y - 300 - (ball.radius - 2) <= cpuPaddle.y + 10
         && ball.y - 300 + (ball.radius - 2) >= cpuPaddle.y - 10) {
       console.log(`cpu hit!`);
     } else {
-      ticker.removeEventListener('tick', scaleBall);
-      setTimeout(setStage(ball, stage, ballMarker), 1000);
+      this.ticker.removeAllEventListeners('tick');
+      this.ticker.addEventListener('tick', this.movePaddles.bind(this));
+      setTimeout(this.setStage.bind(this), 1000);
     }
   }
 
-  function scaleBall() {
-    if (ball.direction === "out"){
-      ball.distance += 1;
-    } else {
-      ball.distance -= 1;
-    }
-
-    if (ball.distance === MAX_DISTANCE){
-      detectCpuHit();
-      ball.direction = "in";
-    } else if (ball.distance === 0){
-      detectHumanHit();
-      ball.direction = "out";
-    }
+  updateBallMarker() {
+    const ballMarker = this.stage.getChildByName('ballMarker');
+    const ball = this.stage.getChildByName('ball');
 
     const markerX = 88 + ball.distance * (321 - 88) / MAX_DISTANCE;
     const markerY = 91 + ball.distance * (247 - 91) / MAX_DISTANCE;
     const markerW = 624 - ball.distance * (624 - 158) / MAX_DISTANCE;
     const markerH = 418 - ball.distance * (418 - 106) / MAX_DISTANCE;
+
     ballMarker.graphics.clear().beginStroke("#32CD32").drawRect(markerX, markerY, markerW, markerH);
+  }
+
+  scaleBall() {
+    const ball = this.stage.getChildByName('ball');
 
     ball.scaleX = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
     ball.scaleY = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
 
     ball.radius = 35 * ball.scaleX;
+  }
 
+  applySpin() {
+    const ball = this.stage.getChildByName('ball');
     ball.xVelocity -= ball.xSpin / MAX_DISTANCE;
     ball.yVelocity -= ball.ySpin / MAX_DISTANCE;
+  }
 
+  applyVelocity() {
+    const ball = this.stage.getChildByName('ball');
     ball.rawX += ball.xVelocity;
     ball.farX = (ball.rawX - 400) * 79/312 + 400;
+
+    ball.rawY += ball.yVelocity;
+    ball.farY = (ball.rawY - 300) * 53/209 + 300;
+  }
+
+  detectWallBounce() {
+    const ball = this.stage.getChildByName('ball');
 
     if(ball.rawX >= 712 || ball.rawX <= 88){
       ball.xVelocity = ball.xVelocity * -1;
       ball.xSpin = 0;
     }
 
-    ball.rawY += ball.yVelocity;
-    ball.farY = (ball.rawY - 300) * 53/209 + 300;
-
     if(ball.rawY >= 509 || ball.rawY <= 91){
       ball.yVelocity = ball.yVelocity * -1;
       ball.ySpin = 0;
     }
+  }
+
+  applyPerspective() {
+    const ball = this.stage.getChildByName('ball');
 
     ball.x = ball.rawX - (ball.rawX - ball.farX) * ball.distance / MAX_DISTANCE;
     ball.y = ball.rawY - (ball.rawY - ball.farY) * ball.distance / MAX_DISTANCE;
 
+
+    //these lines shift the ball slightly so it doesn't appear to be out of bounds
     if (ball.rawX > 400) {
       ball.x -= ball.radius * (ball.rawX - 400)/312;
     } else if (ball.rawX < 400) {
@@ -294,26 +326,49 @@ const hitBall = (ball, stage, ballMarker) => (e) => {
     } else if (ball.rawY < 300) {
       ball.y += ball.radius * (300 - ball.rawY)/209;
     }
-
-    stage.update();
   }
-};
 
-const drawRectangle = (stage, shape, { x, y, w, h }) => {
-  shape.graphics.beginStroke("#FFF8F0");
-  shape.graphics.setStrokeStyle(1);
-  shape.snapToPixel = true;
-  shape.graphics.drawRect(x, y, w, h);
+  updateDistance() {
+    const ball = this.stage.getChildByName('ball');
+    if (ball.direction === "out"){
+      ball.distance += 1;
+    } else {
+      ball.distance -= 1;
+    }
+  }
 
-  stage.addChild(shape);
-};
+  detectGoalOrHit() {
+    const ball = this.stage.getChildByName('ball');
+    if (ball.distance === MAX_DISTANCE){
+      this.detectCpuHit();
+      ball.direction = "in";
+    } else if (ball.distance === 0){
+      this.detectHumanHit();
+      ball.direction = "out";
+    }
+  }
 
-const drawCorner = (stage, shape, { mtx, mty, ltx, lty }) => {
-  shape.graphics.beginStroke("#FFF8F0");
-  shape.graphics.setStrokeStyle(1);
-  shape.snapToPixel = true;
-  shape.graphics.moveTo(mtx, mty);
-  shape.graphics.lineTo(ltx, lty);
+  moveBall() {
+    this.updateDistance();
+    this.updateBallMarker();
+    this.scaleBall();
+    this.detectGoalOrHit();
+    this.detectWallBounce();
+    this.applySpin();
+    this.applyVelocity();
+    this.applyPerspective();
 
-  stage.addChild(shape);
-};
+    this.stage.update();
+  }
+
+  hitBall(e) {
+    e.remove();
+    this.getSpin();
+
+    this.ticker.addEventListener('tick', this.moveBall.bind(this));
+  }
+
+
+}
+
+module.exports = Corridor;
