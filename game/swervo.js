@@ -1,9 +1,19 @@
 const Corridor = require('./corridor.js')
 
-const init = () => {
-  const stage = new createjs.Stage("myCanvas");
+class Swervo {
 
-  let corridor = new Corridor(stage);
+  constructor() {
+    this.stage = new createjs.Stage("myCanvas");
+    this.corridor = new Corridor(this.stage);
+
+    this.cpuStrikes = 3;
+    this.humanStrikes = 5;
+    this.level = 1;
+  }
+}
+
+const init = () => {
+  const swervo = new Swervo;
 };
 
 document.addEventListener("DOMContentLoaded", init)

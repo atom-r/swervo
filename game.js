@@ -46,10 +46,20 @@
 
 	const Corridor = __webpack_require__(1)
 
-	const init = () => {
-	  const stage = new createjs.Stage("myCanvas");
+	class Swervo {
 
-	  let corridor = new Corridor(stage);
+	  constructor() {
+	    this.stage = new createjs.Stage("myCanvas");
+	    this.corridor = new Corridor(this.stage);
+
+	    this.cpuStrikes = 3;
+	    this.humanStrikes = 5;
+	    this.level = 1;
+	  }
+	}
+
+	const init = () => {
+	  const swervo = new Swervo;
 	};
 
 	document.addEventListener("DOMContentLoaded", init)
@@ -69,6 +79,11 @@
 	    this.stage = stage;
 	    this.ticker = createjs.Ticker;
 	    this.ticker.setFPS(60);
+
+	    this.nearHit = new Audio('./audio/nearhit.mp3');
+	    this.farHit = new Audio('./audio/farhit.mp3');
+	    this.wallHit = new Audio('./audio/wallhit.mp3');
+	    this.goal = new Audio('./audio/goal.mp3');
 
 	    this.renderCorridor();
 	    this.renderPieces();
@@ -98,9 +113,9 @@
 	  buildHumanPaddle() {
 	    const humanPaddle = new createjs.Shape();
 	    humanPaddle.graphics
-	      .beginStroke("DeepSkyBlue")
+	      .beginStroke("#2176FF")
 	      .setStrokeStyle(4)
-	      .beginFill("DeepSkyBlue")
+	      .beginFill("#2176FF")
 	      .drawRoundRect(0, 0, 120, 80, 10);
 	    humanPaddle.alpha = 0.5;
 	    humanPaddle.name = 'humanPaddle';
@@ -113,9 +128,9 @@
 	  buildCpuPaddle() {
 	    const cpuPaddle = new createjs.Shape();
 	    cpuPaddle.graphics
-	      .beginStroke("#F00")
+	      .beginStroke("#F26430")
 	      .setStrokeStyle(2)
-	      .beginFill("#F00")
+	      .beginFill("#F26430")
 	      .drawRoundRect(385, 290, 30, 20, 3);
 	    cpuPaddle.alpha = 0.5;
 	    cpuPaddle.name = 'cpuPaddle';
@@ -131,7 +146,7 @@
 	    const ball = new createjs.Shape();
 	    ball
 	      .graphics
-	      .beginRadialGradientFill(["#FF4500","#F00"], [0, 1], 15, -15, 0, 0, 0, 35)
+	      .beginRadialGradientFill(["#009B72","#006B42"], [0, 1], 15, -15, 0, 0, 0, 35)
 	      .drawCircle(0, 0, 35);
 	    ball.name = "ball";
 
@@ -142,7 +157,7 @@
 	  drawBallMarker() {
 	    const ballMarker = new createjs.Shape();
 
-	    ballMarker.graphics.beginStroke("#32CD32");
+	    ballMarker.graphics.beginStroke("#009B72");
 	    ballMarker.graphics.setStrokeStyle(1);
 	    ballMarker.snapToPixel = true;
 	    ballMarker.graphics.drawRect(88, 91, 624, 418);
@@ -277,7 +292,7 @@
 	    ball.scaleY = 1;
 	    ball.xSpin = 0;
 	    ball.ySpin = 0;
-	    ballMarker.graphics.clear().beginStroke("#32CD32").drawRect(88, 91, 624, 418);
+	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(88, 91, 624, 418);
 	    this.stage.on('stagemousedown', this.hitBall.bind(this));
 	  }
 
@@ -288,8 +303,12 @@
 	        && ball.x + (ball.radius) >= humanPaddle.x
 	        && ball.y - (ball.radius) <= humanPaddle.y + 60
 	        && ball.y + (ball.radius) >= humanPaddle.y) {
+	      this.nearHit.load();
+	      this.nearHit.play();
 	      this.getSpin();
 	    } else {
+	      this.goal.load();
+	      this.goal.play();
 	      this.ticker.removeAllEventListeners('tick');
 	      this.ticker.addEventListener('tick', this.movePaddles.bind(this));
 	      setTimeout(this.setStage.bind(this), 1000);
@@ -310,8 +329,11 @@
 	        && ball.x - 400 + (ball.radius - 2) >= cpuPaddle.x - 15
 	        && ball.y - 300 - (ball.radius - 2) <= cpuPaddle.y + 10
 	        && ball.y - 300 + (ball.radius - 2) >= cpuPaddle.y - 10) {
-	      console.log(`cpu hit!`);
+	      this.farHit.load();
+	      this.farHit.play();
 	    } else {
+	      this.goal.load();
+	      this.goal.play();
 	      this.ticker.removeAllEventListeners('tick');
 	      this.ticker.addEventListener('tick', this.movePaddles.bind(this));
 	      setTimeout(this.setStage.bind(this), 1000);
@@ -327,7 +349,7 @@
 	    const markerW = 624 - ball.distance * (624 - 158) / MAX_DISTANCE;
 	    const markerH = 418 - ball.distance * (418 - 106) / MAX_DISTANCE;
 
-	    ballMarker.graphics.clear().beginStroke("#32CD32").drawRect(markerX, markerY, markerW, markerH);
+	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(markerX, markerY, markerW, markerH);
 	  }
 
 	  scaleBall() {
@@ -360,11 +382,15 @@
 	    if(ball.rawX >= 712 || ball.rawX <= 88){
 	      ball.xVelocity = ball.xVelocity * -1;
 	      ball.xSpin = 0;
+	      this.wallHit.load();
+	      this.wallHit.play();
 	    }
 
 	    if(ball.rawY >= 509 || ball.rawY <= 91){
 	      ball.yVelocity = ball.yVelocity * -1;
 	      ball.ySpin = 0;
+	      this.wallHit.load();
+	      this.wallHit.play();
 	    }
 	  }
 
@@ -425,6 +451,7 @@
 	  hitBall(e) {
 	    e.remove();
 	    this.getSpin();
+	    this.nearHit.play();
 
 	    this.ticker.addEventListener('tick', this.moveBall.bind(this));
 	  }
