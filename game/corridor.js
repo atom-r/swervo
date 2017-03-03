@@ -114,12 +114,6 @@ const hitBall = (ball, stage, ballMarker) => (e) => {
 
     ball.radius = 35 * ball.scaleX;
 
-    //closest box right bound x = 712, left bound x = 88
-    //            top boundy = 91, bottom bound y = 509
-
-    //furthest box right bound x = 479, left bound x = 321
-    //            top boundy = 353, bottom bound y = 247
-
     ball.xVelocity -= ball.xSpin / MAX_DISTANCE;
     ball.yVelocity -= ball.ySpin / MAX_DISTANCE;
 
@@ -153,8 +147,6 @@ const hitBall = (ball, stage, ballMarker) => (e) => {
     } else if (ball.rawY < 300) {
       ball.y += ball.radius * (300 - ball.rawY)/209;
     }
-
-    // const cpuPaddle = stage.getChildByName('cpuPaddle');
 
     stage.update();
   }
