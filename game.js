@@ -49,7 +49,7 @@
 	class Swervo {
 
 	  constructor() {
-	    this.stage = new createjs.Stage("myCanvas");
+	    this.stage = this.stage || new createjs.Stage("myCanvas");
 
 	    this.cpuStrikes = 2;
 	    this.humanStrikes = 5;
@@ -60,16 +60,14 @@
 	    this.buildCpuScore();
 	    this.buildHumanScore();
 	    this.setStage();
-
 	  }
 
-	  resetPieces(losingPlayer) {
-	    if(losingPlayer === 'cpu') {
+	  resetPieces(loser) {
+	    if(loser === 'cpu') {
 	      this.updateCpuStrikes();
 	    } else {
 	      this.updateHumanStrikes();
 	    }
-	    setTimeout(this.setStage.bind(this), 1000);
 	  }
 
 	  setStage() {
@@ -97,25 +95,30 @@
 	      this.cpuStrikes -= 1;
 	    } else {
 	      this.level += 1;
+	      this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.5;
 	      this.cpuStrikes = 2;
+	      console.log(this.level);
+	      setTimeout( () => {
+	        this.corridor.max_distance -= 5
+	      }, 1000);
 	      setTimeout(this.buildCpuStrikes.bind(this), 1000);
 	    }
+	    setTimeout(this.setStage.bind(this), 1000);
 	  }
 
 	  updateHumanStrikes() {
 	    if(this.humanStrikes > 0){
 	      this.humanStrikeShapes[this.humanStrikes - 1].graphics.clear();
 	      this.humanStrikes -= 1;
+	      setTimeout(this.setStage.bind(this), 1000);
 	    } else {
-	      this.level += 1;
-	      this.humanStrikes = 5;
-	      setTimeout(this.buildHumanStrikes.bind(this), 1000);
+	      this.printGameOver();
 	    }
 	  }
 
-	  printYouWon() {
-	    const text = new createjs.Text("You Win", "36px Arial", "#FFF8F0");
-	    text.x = 400;
+	  printGameOver() {
+	    const text = new createjs.Text("Game Over", "42px Arial", "#FFF8F0");
+	    text.x = 300;
 	    text.y = 300;
 	    text.textBaseline = "alphabetic";
 
@@ -182,7 +185,6 @@
 
 	CENTER_X = 400;
 	CENTER_Y = 300;
-	MAX_DISTANCE = 80;
 
 	class Corridor {
 
@@ -190,12 +192,16 @@
 	    this.stage = stage;
 	    this.swervo = swervo;
 
+	    this.max_distance = 80;
+	    this.cpuTrackingRatio = 30;
+
 	    this.ticker = createjs.Ticker;
 	    this.ticker.setFPS(60);
 
 	    this.nearHit = new Audio('./audio/nearhit.mp3');
 	    this.farHit = new Audio('./audio/farhit.mp3');
-	    this.wallHit = new Audio('./audio/wallhit.mp3');
+	    this.vWallHit = new Audio('./audio/wallhit.mp3');
+	    this.hWallHit = new Audio('./audio/wallhit0.mp3');
 	    this.goal = new Audio('./audio/goal.mp3');
 
 	    this.renderCorridor();
@@ -313,14 +319,15 @@
 
 	    cpuPaddle.prevX = cpuPaddle.rawX;
 	    cpuPaddle.prevY = cpuPaddle.rawY;
-	    cpuPaddle.rawX += cpuDifX/25;
+	    cpuPaddle.rawX += cpuDifX / (4 + this.cpuTrackingRatio);
+	    cpuPaddle.rawY += cpuDifY / (4 + this.cpuTrackingRatio);
+
 	    if (cpuPaddle.rawX > 249){
 	      cpuPaddle.rawX = 249;
 	    } else if (cpuPaddle.rawX < -241) {
 	      cpuPaddle.rawX = -241;
 	    }
 
-	    cpuPaddle.rawY += cpuDifY/10;
 	    if (cpuPaddle.rawY > 161){
 	      cpuPaddle.rawY = 161;
 	    } else if (cpuPaddle.rawY < -161) {
@@ -408,10 +415,10 @@
 	  detectCpuHit() {
 	    const ball = this.stage.getChildByName('ball');
 	    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-	    if (ball.x - 400 - (ball.radius - 2) <= cpuPaddle.x + 15
-	        && ball.x - 400 + (ball.radius - 2) >= cpuPaddle.x - 15
-	        && ball.y - 300 - (ball.radius - 2) <= cpuPaddle.y + 10
-	        && ball.y - 300 + (ball.radius - 2) >= cpuPaddle.y - 10) {
+	    if (ball.x - 400 - (ball.radius) <= cpuPaddle.x + 15
+	        && ball.x - 400 + (ball.radius) >= cpuPaddle.x - 15
+	        && ball.y - 300 - (ball.radius) <= cpuPaddle.y + 10
+	        && ball.y - 300 + (ball.radius) >= cpuPaddle.y - 10) {
 	      this.farHit.load();
 	      this.farHit.play();
 	    } else {
@@ -427,10 +434,10 @@
 	    const ballMarker = this.stage.getChildByName('ballMarker');
 	    const ball = this.stage.getChildByName('ball');
 
-	    const markerX = 88 + ball.distance * (321 - 88) / MAX_DISTANCE;
-	    const markerY = 91 + ball.distance * (247 - 91) / MAX_DISTANCE;
-	    const markerW = 624 - ball.distance * (624 - 158) / MAX_DISTANCE;
-	    const markerH = 418 - ball.distance * (418 - 106) / MAX_DISTANCE;
+	    const markerX = 88 + ball.distance * (321 - 88) / this.max_distance;
+	    const markerY = 91 + ball.distance * (247 - 91) / this.max_distance;
+	    const markerW = 624 - ball.distance * (624 - 158) / this.max_distance;
+	    const markerH = 418 - ball.distance * (418 - 106) / this.max_distance;
 
 	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(markerX, markerY, markerW, markerH);
 	  }
@@ -438,16 +445,16 @@
 	  scaleBall() {
 	    const ball = this.stage.getChildByName('ball');
 
-	    ball.scaleX = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
-	    ball.scaleY = 1 - ball.distance * 3 / (4 * MAX_DISTANCE);
+	    ball.scaleX = 1 - ball.distance * 3 / (4 * this.max_distance);
+	    ball.scaleY = 1 - ball.distance * 3 / (4 * this.max_distance);
 
 	    ball.radius = 35 * ball.scaleX;
 	  }
 
 	  applySpin() {
 	    const ball = this.stage.getChildByName('ball');
-	    ball.xVelocity -= ball.xSpin / MAX_DISTANCE;
-	    ball.yVelocity -= ball.ySpin / MAX_DISTANCE;
+	    ball.xVelocity -= ball.xSpin / this.max_distance;
+	    ball.yVelocity -= ball.ySpin / this.max_distance;
 	  }
 
 	  applyVelocity() {
@@ -465,23 +472,23 @@
 	    if(ball.rawX >= 712 || ball.rawX <= 88){
 	      ball.xVelocity = ball.xVelocity * -1;
 	      ball.xSpin = 0;
-	      this.wallHit.load();
-	      this.wallHit.play();
+	      this.vWallHit.load();
+	      this.vWallHit.play();
 	    }
 
 	    if(ball.rawY >= 509 || ball.rawY <= 91){
 	      ball.yVelocity = ball.yVelocity * -1;
 	      ball.ySpin = 0;
-	      this.wallHit.load();
-	      this.wallHit.play();
+	      this.hWallHit.load();
+	      this.hWallHit.play();
 	    }
 	  }
 
 	  applyPerspective() {
 	    const ball = this.stage.getChildByName('ball');
 
-	    ball.x = ball.rawX - (ball.rawX - ball.farX) * ball.distance / MAX_DISTANCE;
-	    ball.y = ball.rawY - (ball.rawY - ball.farY) * ball.distance / MAX_DISTANCE;
+	    ball.x = ball.rawX - (ball.rawX - ball.farX) * ball.distance / this.max_distance;
+	    ball.y = ball.rawY - (ball.rawY - ball.farY) * ball.distance / this.max_distance;
 
 
 	    //these lines shift the ball slightly so it doesn't appear to be out of bounds
@@ -509,7 +516,7 @@
 
 	  detectGoalOrHit() {
 	    const ball = this.stage.getChildByName('ball');
-	    if (ball.distance === MAX_DISTANCE){
+	    if (ball.distance === this.max_distance){
 	      this.detectCpuHit();
 	      ball.direction = "in";
 	    } else if (ball.distance === 0){

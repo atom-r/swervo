@@ -3,7 +3,7 @@ const Corridor = require('./corridor.js')
 class Swervo {
 
   constructor() {
-    this.stage = new createjs.Stage("myCanvas");
+    this.stage = this.stage || new createjs.Stage("myCanvas");
 
     this.cpuStrikes = 2;
     this.humanStrikes = 5;
@@ -14,16 +14,14 @@ class Swervo {
     this.buildCpuScore();
     this.buildHumanScore();
     this.setStage();
-
   }
 
-  resetPieces(losingPlayer) {
-    if(losingPlayer === 'cpu') {
+  resetPieces(loser) {
+    if(loser === 'cpu') {
       this.updateCpuStrikes();
     } else {
       this.updateHumanStrikes();
     }
-    setTimeout(this.setStage.bind(this), 1000);
   }
 
   setStage() {
@@ -51,25 +49,30 @@ class Swervo {
       this.cpuStrikes -= 1;
     } else {
       this.level += 1;
+      this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.5;
       this.cpuStrikes = 2;
+      console.log(this.level);
+      setTimeout( () => {
+        this.corridor.max_distance -= 5
+      }, 1000);
       setTimeout(this.buildCpuStrikes.bind(this), 1000);
     }
+    setTimeout(this.setStage.bind(this), 1000);
   }
 
   updateHumanStrikes() {
     if(this.humanStrikes > 0){
       this.humanStrikeShapes[this.humanStrikes - 1].graphics.clear();
       this.humanStrikes -= 1;
+      setTimeout(this.setStage.bind(this), 1000);
     } else {
-      this.level += 1;
-      this.humanStrikes = 5;
-      setTimeout(this.buildHumanStrikes.bind(this), 1000);
+      this.printGameOver();
     }
   }
 
-  printYouWon() {
-    const text = new createjs.Text("You Win", "36px Arial", "#FFF8F0");
-    text.x = 400;
+  printGameOver() {
+    const text = new createjs.Text("Game Over", "42px Arial", "#FFF8F0");
+    text.x = 300;
     text.y = 300;
     text.textBaseline = "alphabetic";
 
