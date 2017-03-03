@@ -21,7 +21,7 @@ class Swervo {
     if(losingPlayer === 'cpu') {
       this.updateCpuStrikes();
     } else {
-      this.humanStrikes -= 1;
+      this.updateHumanStrikes();
     }
     setTimeout(this.setStage.bind(this), 1000);
   }
@@ -47,12 +47,23 @@ class Swervo {
 
   updateCpuStrikes() {
     if(this.cpuStrikes > 0){
-      this.strikes[this.cpuStrikes - 1].graphics.clear();
+      this.cpuStrikeShapes[this.cpuStrikes - 1].graphics.clear();
       this.cpuStrikes -= 1;
     } else {
       this.level += 1;
       this.cpuStrikes = 2;
       setTimeout(this.buildCpuStrikes.bind(this), 1000);
+    }
+  }
+
+  updateHumanStrikes() {
+    if(this.humanStrikes > 0){
+      this.humanStrikeShapes[this.humanStrikes - 1].graphics.clear();
+      this.humanStrikes -= 1;
+    } else {
+      this.level += 1;
+      this.humanStrikes = 5;
+      setTimeout(this.buildHumanStrikes.bind(this), 1000);
     }
   }
 
@@ -68,24 +79,23 @@ class Swervo {
   }
 
   buildCpuStrikes() {
-    this.strikes = [];
+    this.cpuStrikeShapes = [];
     for (let i = 0; i < this.cpuStrikes; i++) {
-      this.strikes[i] = new createjs.Shape();
-      this.strikes[i].graphics.beginFill("#F26430").drawCircle((160 + i * 25), 62, 10);
+      this.cpuStrikeShapes[i] = new createjs.Shape();
+      this.cpuStrikeShapes[i].graphics.beginFill("#F26430").drawCircle((160 + i * 25), 62, 10);
 
-      this.stage.addChild(this.strikes[i]);
+      this.stage.addChild(this.cpuStrikeShapes[i]);
     }
   }
 
   buildHumanStrikes() {
-    const ball = new createjs.Shape();
-    ball
-      .graphics
-      .beginRadialGradientFill(["#009B72","#006B42"], [0, 1], 15, -15, 0, 0, 0, 5)
-      .drawCircle(0, 0, 5);
-    ball.name = "ball";
+    this.humanStrikeShapes = [];
+    for (let i = 0; i < this.humanStrikes; i++) {
+      this.humanStrikeShapes[i] = new createjs.Shape();
+      this.humanStrikeShapes[i].graphics.beginFill("#2176FF").drawCircle((630 - i * 25), 62, 10);
 
-    this.stage.addChild(ball);
+      this.stage.addChild(this.humanStrikeShapes[i]);
+    }
   }
 
   buildCpuScore() {
@@ -107,6 +117,8 @@ class Swervo {
     text.textBaseline = "alphabetic";
 
     this.stage.addChild(text);
+    this.buildHumanStrikes();
+
     this.stage.update();
   }
 }
