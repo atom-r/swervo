@@ -7,18 +7,13 @@ MAX_DISTANCE = 80;
 const init = () => {
   const stage = new createjs.Stage("myCanvas");
 
-  const ball = new createjs.Shape();
-  ball.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 35);
-  ball.name = "ball";
-
   renderCorridor(stage);
-  stage.addChild(ball);
-  renderPaddles(stage);
+  renderPieces(stage);
 
   const ballMarker = new createjs.Shape();
   drawBallMarker(stage, ballMarker);
 
-  setStage(ball, stage, ballMarker)();
+  setStage(stage.getChildByName('ball'), stage, ballMarker)();
 
 };
 
@@ -62,10 +57,10 @@ const hitBall = (ball, stage, ballMarker) => (e) => {
 
 
   function detectHumanHit() {
-    if (ball.x - (ball.radius - 10) <= humanPaddle.x + 120
-        && ball.x + (ball.radius - 10) >= humanPaddle.x
-        && ball.y - (ball.radius - 10) <= humanPaddle.y + 60
-        && ball.y + (ball.radius - 10) >= humanPaddle.y) {
+    if (ball.x - (ball.radius) <= humanPaddle.x + 120
+        && ball.x + (ball.radius) >= humanPaddle.x
+        && ball.y - (ball.radius) <= humanPaddle.y + 60
+        && ball.y + (ball.radius) >= humanPaddle.y) {
       console.log(`${humanPaddle.x}, ${humanPaddle.prevX}`);
       ball.xSpin += humanPaddle.x - humanPaddle.prevX;
       ball.ySpin += humanPaddle.y - humanPaddle.prevY;
@@ -205,28 +200,40 @@ const renderCorridor = stage => {
 
 };
 
-const renderPaddles = stage => {
-  let humanPaddle = new createjs.Shape();
-  humanPaddle.graphics.beginStroke("DeepSkyBlue");
-  humanPaddle.graphics.setStrokeStyle(4);
-  humanPaddle.snapToPixel = true;
-  humanPaddle.graphics.drawRoundRect(0, 0, 120, 80, 10);
+const renderPieces = stage => {
+  const humanPaddle = new createjs.Shape();
+  humanPaddle.graphics
+    .beginStroke("DeepSkyBlue")
+    .setStrokeStyle(4)
+    .beginFill("DeepSkyBlue")
+    .drawRoundRect(0, 0, 120, 80, 10);
+  humanPaddle.alpha = 0.5;
   humanPaddle.name = 'humanPaddle';
   humanPaddle.prevX = 0;
   humanPaddle.prevY = 0;
 
-  let cpuPaddle = new createjs.Shape();
-  cpuPaddle.graphics.beginStroke("#92140C");
-  cpuPaddle.graphics.setStrokeStyle(2);
-  cpuPaddle.snapToPixel = true;
-  cpuPaddle.graphics.drawRoundRect(385, 290, 30, 20, 3);
+  const cpuPaddle = new createjs.Shape();
+  cpuPaddle.graphics
+    .beginStroke("#F00")
+    .setStrokeStyle(2)
+    .beginFill("#F00")
+    .drawRoundRect(385, 290, 30, 20, 3);
+  cpuPaddle.alpha = 0.5;
   cpuPaddle.name = 'cpuPaddle';
   cpuPaddle.rawX = 0;
   cpuPaddle.rawY = 0;
   cpuPaddle.prevRawX = 0;
   cpuPaddle.prevRawY = 0;
 
+  const ball = new createjs.Shape();
+  ball
+    .graphics
+    .beginRadialGradientFill(["#FF4500","#F00"], [0, 1], 15, -15, 0, 0, 0, 35)
+    .drawCircle(0, 0, 35);
+  ball.name = "ball";
+
   stage.addChild(cpuPaddle);
+  stage.addChild(ball);
   stage.addChild(humanPaddle);
 
   createjs.Ticker.addEventListener('tick', movePaddles);
@@ -259,7 +266,7 @@ const renderPaddles = stage => {
 
     cpuPaddle.prevX = cpuPaddle.rawX;
     cpuPaddle.prevY = cpuPaddle.rawY;
-    cpuPaddle.rawX += cpuDifX/10;
+    cpuPaddle.rawX += cpuDifX/25;
     if (cpuPaddle.rawX > 249){
       cpuPaddle.rawX = 249;
     } else if (cpuPaddle.rawX < -241) {
