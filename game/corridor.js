@@ -1,14 +1,166 @@
-
-
 CENTER_X = 400;
 CENTER_Y = 300;
 MAX_DISTANCE = 80;
 
+class Corridor {
+
+  constructor(stage) {
+    this.stage = stage;
+    this.renderCorridor();
+    this.renderPieces();
+  }
+
+  buildHumanPaddle() {
+    const humanPaddle = new createjs.Shape();
+    humanPaddle.graphics
+      .beginStroke("DeepSkyBlue")
+      .setStrokeStyle(4)
+      .beginFill("DeepSkyBlue")
+      .drawRoundRect(0, 0, 120, 80, 10);
+    humanPaddle.alpha = 0.5;
+    humanPaddle.name = 'humanPaddle';
+    humanPaddle.prevX = 0;
+    humanPaddle.prevY = 0;
+
+    this.stage.addChild(humanPaddle);
+  }
+
+  buildCpuPaddle() {
+    const cpuPaddle = new createjs.Shape();
+    cpuPaddle.graphics
+      .beginStroke("#F00")
+      .setStrokeStyle(2)
+      .beginFill("#F00")
+      .drawRoundRect(385, 290, 30, 20, 3);
+    cpuPaddle.alpha = 0.5;
+    cpuPaddle.name = 'cpuPaddle';
+    cpuPaddle.rawX = 0;
+    cpuPaddle.rawY = 0;
+    cpuPaddle.prevRawX = 0;
+    cpuPaddle.prevRawY = 0;
+
+    this.stage.addChild(cpuPaddle);
+  }
+
+  buildBall() {
+    const ball = new createjs.Shape();
+    ball
+      .graphics
+      .beginRadialGradientFill(["#FF4500","#F00"], [0, 1], 15, -15, 0, 0, 0, 35)
+      .drawCircle(0, 0, 35);
+    ball.name = "ball";
+
+    this.stage.addChild(ball);
+  }
+
+  moveHumanPaddle() {
+    const humanPaddle = this.stage.getChildByName('humanPaddle');
+    let difX;
+    let difY;
+
+    if (this.stage.mouseX < 652 && this.stage.mouseX > 148){
+      difX = this.stage.mouseX - humanPaddle.x - 60;
+    } else if (this.stage.mouseX <= 148){
+      difX = 148 - humanPaddle.x - 60;
+    } else {
+      difX = 652 - humanPaddle.x - 60;
+    }
+
+    if (this.stage.mouseY < 469 && this.stage.mouseY > 131){
+      difY = this.stage.mouseY - humanPaddle.y - 40;
+    } else if (this.stage.mouseY <= 131){
+      difY = 131 - humanPaddle.y - 40;
+    } else {
+      difY = 469 - humanPaddle.y - 40;
+    }
+
+    humanPaddle.prevX = humanPaddle.x;
+    humanPaddle.prevY = humanPaddle.y;
+    humanPaddle.x += difX/1.2;
+    humanPaddle.y += difY/1.2;
+  }
+
+  moveCpuPaddle() {
+    const ball = this.stage.getChildByName('ball');
+    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
+    const cpuDifX = ball.rawX - 400 - cpuPaddle.rawX;
+    const cpuDifY = ball.rawY - 300 - cpuPaddle.rawY;
+
+    cpuPaddle.prevX = cpuPaddle.rawX;
+    cpuPaddle.prevY = cpuPaddle.rawY;
+    cpuPaddle.rawX += cpuDifX/25;
+    if (cpuPaddle.rawX > 249){
+      cpuPaddle.rawX = 249;
+    } else if (cpuPaddle.rawX < -241) {
+      cpuPaddle.rawX = -241;
+    }
+
+    cpuPaddle.rawY += cpuDifY/10;
+    if (cpuPaddle.rawY > 161){
+      cpuPaddle.rawY = 161;
+    } else if (cpuPaddle.rawY < -161) {
+      cpuPaddle.rawY = -161;
+    }
+
+    cpuPaddle.x = cpuPaddle.rawX * 79/312;
+    cpuPaddle.y = cpuPaddle.rawY * 53/209;
+  }
+
+  movePaddles() {
+    this.moveHumanPaddle();
+    this.moveCpuPaddle();
+    this.stage.update();
+  }
+
+  renderPieces() {
+    debugger
+    this.buildCpuPaddle();
+    this.buildBall();
+    this.buildHumanPaddle();
+
+    createjs.Ticker.addEventListener('tick', this.movePaddles.bind(this));
+    createjs.Ticker.setFPS(60);
+  }
+
+  renderCorridor() {
+    const border1 = new createjs.Shape();
+    const border2 = new createjs.Shape();
+    const border3 = new createjs.Shape();
+    const border4 = new createjs.Shape();
+    const border5 = new createjs.Shape();
+    const border6 = new createjs.Shape();
+    const border7 = new createjs.Shape();
+    const border8 = new createjs.Shape();
+    const border9 = new createjs.Shape();
+
+    drawRectangle(this.stage, border1, { x: 88, y: 91, w: 624, h: 418 });
+    drawRectangle(this.stage, border2, { x: 146, y: 130, w: 508, h: 340 });
+    drawRectangle(this.stage, border3, { x: 195, y: 162, w: 410, h: 276 });
+    drawRectangle(this.stage, border4, { x: 234, y: 190, w: 332, h: 221 });
+    drawRectangle(this.stage, border5, { x: 263, y: 208, w: 275, h: 184 });
+    drawRectangle(this.stage, border6, { x: 283, y: 222, w: 234, h: 157 });
+    drawRectangle(this.stage, border7, { x: 299, y: 233, w: 202, h: 135 });
+    drawRectangle(this.stage, border8, { x: 312, y: 240, w: 176, h: 120 });
+    drawRectangle(this.stage, border9, { x: 322, y: 247, w: 158, h: 106 });
+
+    let cornerNW = new createjs.Shape();
+    let cornerNE = new createjs.Shape();
+    let cornerSE = new createjs.Shape();
+    let cornerSW = new createjs.Shape();
+
+    drawCorner(this.stage, cornerNW, { mtx: 88, mty: 91, ltx: 322, lty: 247 });
+    drawCorner(this.stage, cornerNW, { mtx: 712, mty: 91, ltx: 479, lty: 247 });
+    drawCorner(this.stage, cornerNW, { mtx: 712, mty: 509, ltx: 479, lty: 353 });
+    drawCorner(this.stage, cornerNW, { mtx: 88, mty: 509, ltx: 322, lty: 353 });
+
+  }
+
+}
+
 const init = () => {
   const stage = new createjs.Stage("myCanvas");
 
-  renderCorridor(stage);
-  renderPieces(stage);
+  let corridor = new Corridor(stage);
 
   const ballMarker = new createjs.Shape();
   drawBallMarker(stage, ballMarker);
@@ -164,131 +316,4 @@ const drawCorner = (stage, shape, { mtx, mty, ltx, lty }) => {
   shape.graphics.lineTo(ltx, lty);
 
   stage.addChild(shape);
-};
-
-const renderCorridor = stage => {
-
-  const border1 = new createjs.Shape();
-  const border2 = new createjs.Shape();
-  const border3 = new createjs.Shape();
-  const border4 = new createjs.Shape();
-  const border5 = new createjs.Shape();
-  const border6 = new createjs.Shape();
-  const border7 = new createjs.Shape();
-  const border8 = new createjs.Shape();
-  const border9 = new createjs.Shape();
-
-  drawRectangle(stage, border1, { x: 88, y: 91, w: 624, h: 418 });
-  drawRectangle(stage, border2, { x: 146, y: 130, w: 508, h: 340 });
-  drawRectangle(stage, border3, { x: 195, y: 162, w: 410, h: 276 });
-  drawRectangle(stage, border4, { x: 234, y: 190, w: 332, h: 221 });
-  drawRectangle(stage, border5, { x: 263, y: 208, w: 275, h: 184 });
-  drawRectangle(stage, border6, { x: 283, y: 222, w: 234, h: 157 });
-  drawRectangle(stage, border7, { x: 299, y: 233, w: 202, h: 135 });
-  drawRectangle(stage, border8, { x: 312, y: 240, w: 176, h: 120 });
-  drawRectangle(stage, border9, { x: 322, y: 247, w: 158, h: 106 });
-
-  let cornerNW = new createjs.Shape();
-  let cornerNE = new createjs.Shape();
-  let cornerSE = new createjs.Shape();
-  let cornerSW = new createjs.Shape();
-
-  drawCorner(stage, cornerNW, { mtx: 88, mty: 91, ltx: 322, lty: 247 });
-  drawCorner(stage, cornerNW, { mtx: 712, mty: 91, ltx: 479, lty: 247 });
-  drawCorner(stage, cornerNW, { mtx: 712, mty: 509, ltx: 479, lty: 353 });
-  drawCorner(stage, cornerNW, { mtx: 88, mty: 509, ltx: 322, lty: 353 });
-
-};
-
-const renderPieces = stage => {
-  const humanPaddle = new createjs.Shape();
-  humanPaddle.graphics
-    .beginStroke("DeepSkyBlue")
-    .setStrokeStyle(4)
-    .beginFill("DeepSkyBlue")
-    .drawRoundRect(0, 0, 120, 80, 10);
-  humanPaddle.alpha = 0.5;
-  humanPaddle.name = 'humanPaddle';
-  humanPaddle.prevX = 0;
-  humanPaddle.prevY = 0;
-
-  const cpuPaddle = new createjs.Shape();
-  cpuPaddle.graphics
-    .beginStroke("#F00")
-    .setStrokeStyle(2)
-    .beginFill("#F00")
-    .drawRoundRect(385, 290, 30, 20, 3);
-  cpuPaddle.alpha = 0.5;
-  cpuPaddle.name = 'cpuPaddle';
-  cpuPaddle.rawX = 0;
-  cpuPaddle.rawY = 0;
-  cpuPaddle.prevRawX = 0;
-  cpuPaddle.prevRawY = 0;
-
-  const ball = new createjs.Shape();
-  ball
-    .graphics
-    .beginRadialGradientFill(["#FF4500","#F00"], [0, 1], 15, -15, 0, 0, 0, 35)
-    .drawCircle(0, 0, 35);
-  ball.name = "ball";
-
-  stage.addChild(cpuPaddle);
-  stage.addChild(ball);
-  stage.addChild(humanPaddle);
-
-  createjs.Ticker.addEventListener('tick', movePaddles);
-  createjs.Ticker.setFPS(60);
-
-  function movePaddles(event){
-    let difX;
-    let difY;
-
-    if (stage.mouseX < 652 && stage.mouseX > 148){
-      difX = stage.mouseX - humanPaddle.x - 60;
-    } else if (stage.mouseX <= 148){
-      difX = 148 - humanPaddle.x - 60;
-    } else {
-      difX = 652 - humanPaddle.x - 60;
-    }
-
-    if (stage.mouseY < 469 && stage.mouseY > 131){
-      difY = stage.mouseY - humanPaddle.y - 40;
-    } else if (stage.mouseY <= 131){
-      difY = 131 - humanPaddle.y - 40;
-    } else {
-      difY = 469 - humanPaddle.y - 40;
-    }
-
-    const ball = stage.getChildByName('ball');
-    cpuDifX = ball.rawX - 400 - cpuPaddle.rawX;
-    cpuDifY = ball.rawY - 300 - cpuPaddle.rawY;
-
-
-    cpuPaddle.prevX = cpuPaddle.rawX;
-    cpuPaddle.prevY = cpuPaddle.rawY;
-    cpuPaddle.rawX += cpuDifX/25;
-    if (cpuPaddle.rawX > 249){
-      cpuPaddle.rawX = 249;
-    } else if (cpuPaddle.rawX < -241) {
-      cpuPaddle.rawX = -241;
-    }
-
-    cpuPaddle.rawY += cpuDifY/10;
-    if (cpuPaddle.rawY > 161){
-      cpuPaddle.rawY = 161;
-    } else if (cpuPaddle.rawY < -161) {
-      cpuPaddle.rawY = -161;
-    }
-
-    cpuPaddle.x = cpuPaddle.rawX * 79/312;
-    cpuPaddle.y = cpuPaddle.rawY * 53/209;
-
-    humanPaddle.prevX = humanPaddle.x;
-    humanPaddle.prevY = humanPaddle.y;
-    humanPaddle.x += difX/1.2;
-    humanPaddle.y += difY/1.2;
-    stage.update();
-  }
-
-
 };
