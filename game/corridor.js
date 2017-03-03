@@ -4,8 +4,10 @@ MAX_DISTANCE = 80;
 
 class Corridor {
 
-  constructor(stage) {
+  constructor(stage, swervo) {
     this.stage = stage;
+    this.swervo = swervo;
+
     this.ticker = createjs.Ticker;
     this.ticker.setFPS(60);
 
@@ -17,7 +19,6 @@ class Corridor {
     this.renderCorridor();
     this.renderPieces();
 
-    this.setStage();
   }
 
   drawRectangle(shape, { x, y, w, h }) {
@@ -196,35 +197,6 @@ class Corridor {
     this.stage.update();
   }
 
-  setStage() {
-    /*
-      rawX and rawY represent the ball's position as it would appear if it were at a distance of zero.
-      farX and farY represent the ball's position as it would appear if it were at the max distance.
-      ---
-      both must be used, along with the ball's current distance, to render the ball properly in 3D
-      ---
-      the raw and far positions essentially comprise the endpoints of a sloped line.
-      the ball's distance determines where on that line to place the ball.
-      ---
-    */
-    const ball = this.stage.getChildByName('ball');
-    const ballMarker = this.stage.getChildByName('ballMarker');
-    ball.x = 400;
-    ball.y = 300;
-    ball.rawX = 400;
-    ball.rawY = 300;
-    ball.xVelocity = 0;
-    ball.yVelocity = 0;
-    ball.direction = "out";
-    ball.distance = 0;
-    ball.scaleX = 1;
-    ball.scaleY = 1;
-    ball.xSpin = 0;
-    ball.ySpin = 0;
-    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(88, 91, 624, 418);
-    this.stage.on('stagemousedown', this.hitBall.bind(this));
-  }
-
   detectHumanHit() {
     const ball = this.stage.getChildByName('ball');
     const humanPaddle = this.stage.getChildByName('humanPaddle');
@@ -240,7 +212,7 @@ class Corridor {
       this.goal.play();
       this.ticker.removeAllEventListeners('tick');
       this.ticker.addEventListener('tick', this.movePaddles.bind(this));
-      setTimeout(this.setStage.bind(this), 1000);
+      this.swervo.resetPieces('human');
     }
   }
 
@@ -265,7 +237,7 @@ class Corridor {
       this.goal.play();
       this.ticker.removeAllEventListeners('tick');
       this.ticker.addEventListener('tick', this.movePaddles.bind(this));
-      setTimeout(this.setStage.bind(this), 1000);
+      this.swervo.resetPieces('cpu');
     }
   }
 
