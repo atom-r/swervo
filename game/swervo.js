@@ -124,6 +124,8 @@ class Swervo {
   setStage() {
     const ball = this.stage.getChildByName('ball');
     const ballMarker = this.stage.getChildByName('ballMarker');
+
+    this.corridor.ballFillCommand.style = this.corridor.ballGradient;
     ball.x = 400;
     ball.y = 300;
     ball.rawX = 400;

@@ -77,10 +77,11 @@ class Corridor {
 
   buildBall() {
     const ball = new createjs.Shape();
-    ball
+    this.ballFillCommand = ball
       .graphics
-      .beginRadialGradientFill(["#009B72","#006B42"], [0, 1], 15, -15, 0, 0, 0, 35)
-      .drawCircle(0, 0, 35);
+      .beginRadialGradientFill(["#009B72","#006B42"], [0, 1], 15, -15, 0, 0, 0, 35).command;
+    this.ballGradient = this.ballFillCommand.style;
+    ball.graphics.drawCircle(0, 0, 35);
     ball.name = "ball";
 
     this.drawBallMarker();
@@ -212,6 +213,7 @@ class Corridor {
       this.nearHit.play();
       this.getSpin();
     } else {
+      this.ballFillCommand.style = "#F26430";
       this.goal.load();
       this.goal.play();
       this.ticker.removeAllEventListeners('tick');
@@ -239,6 +241,7 @@ class Corridor {
       this.farHit.load();
       this.farHit.play();
     } else {
+      this.ballFillCommand.style = "#2176FF";
       this.goal.load();
       this.goal.play();
       this.ticker.removeAllEventListeners('tick');
