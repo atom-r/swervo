@@ -4,6 +4,7 @@ class Swervo {
 
   constructor() {
     this.stage = this.stage || new createjs.Stage("myCanvas");
+    this.stage.canvas.style.cursor = "none";
 
     this.cpuStrikes = 2;
     this.humanStrikes = 5;
@@ -13,6 +14,7 @@ class Swervo {
 
     this.buildCpuScore();
     this.buildHumanScore();
+    this.printLevel();
     this.setStage();
   }
 
@@ -73,7 +75,7 @@ class Swervo {
 
     const spaceText = new createjs.Text(`Click to restart`, "24px Arial", "#FFF8F0");
     spaceText.x = 320;
-    spaceText.y = 550;
+    spaceText.y = 570;
     spaceText.textBaseline = "alphabetic";
 
     this.stage.addChild(frame);
@@ -86,9 +88,9 @@ class Swervo {
   }
 
   printLevel() {
-    const text = new createjs.Text(`Level ${this.level}`, "42px Arial", "#FFF8F0");
-    text.x = 300;
-    text.y = 300;
+    const text = new createjs.Text(`Level ${this.level}`, "24px Arial", "#FFF8F0");
+    text.x = 363;
+    text.y = 540;
     text.textBaseline = "alphabetic";
     text.name = "level";
 
@@ -118,6 +120,7 @@ class Swervo {
 
     this.buildCpuScore();
     this.buildHumanScore();
+    this.printLevel();
     this.setStage();
   }
 
@@ -147,7 +150,9 @@ class Swervo {
       this.cpuStrikeShapes[this.cpuStrikes - 1].graphics.clear();
       this.cpuStrikes -= 1;
     } else {
+      const level = this.stage.getChildByName('level');
       this.level += 1;
+      level.text = `Level ${this.level}`
       this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.5;
       this.cpuStrikes = 2;
       console.log(this.level);

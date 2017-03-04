@@ -79,7 +79,7 @@ class Corridor {
     const ball = new createjs.Shape();
     this.ballFillCommand = ball
       .graphics
-      .beginRadialGradientFill(["#009B72","#006B42"], [0, 1], 15, -15, 0, 0, 0, 35).command;
+      .beginRadialGradientFill(["#EEE","#444"], [0, 1], 15, -15, 0, 0, 0, 35).command;
     this.ballGradient = this.ballFillCommand.style;
     ball.graphics.drawCircle(0, 0, 35);
     ball.name = "ball";
