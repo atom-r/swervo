@@ -7,7 +7,7 @@ class Corridor {
     this.stage = stage;
     this.swervo = swervo;
 
-    this.max_distance = 80;
+    this.max_distance = 60;
     this.cpuTrackingRatio = 30;
 
     this.ticker = createjs.Ticker;
