@@ -62,12 +62,109 @@
 	    this.setStage();
 	  }
 
+	  buildCpuScore() {
+	    const text = new createjs.Text("CPU", "20px Arial", "#FFF8F0");
+	    text.x = 100;
+	    text.y = 70;
+	    text.textBaseline = "alphabetic";
+
+	    this.stage.addChild(text);
+	    this.buildCpuStrikes();
+
+	    this.stage.update();
+	  }
+
+	  buildCpuStrikes() {
+	    this.cpuStrikeShapes = [];
+	    for (let i = 0; i < this.cpuStrikes; i++) {
+	      this.cpuStrikeShapes[i] = new createjs.Shape();
+	      this.cpuStrikeShapes[i].graphics.beginFill("#F26430").drawCircle((160 + i * 25), 62, 10);
+
+	      this.stage.addChild(this.cpuStrikeShapes[i]);
+	    }
+	  }
+
+	  buildHumanScore() {
+	    const text = new createjs.Text("Player", "20px Arial", "#FFF8F0");
+	    text.x = 650;
+	    text.y = 70;
+	    text.textBaseline = "alphabetic";
+
+	    this.stage.addChild(text);
+	    this.buildHumanStrikes();
+
+	    this.stage.update();
+	  }
+
+	  buildHumanStrikes() {
+	    this.humanStrikeShapes = [];
+	    for (let i = 0; i < this.humanStrikes; i++) {
+	      this.humanStrikeShapes[i] = new createjs.Shape();
+	      this.humanStrikeShapes[i].graphics.beginFill("#2176FF").drawCircle((630 - i * 25), 62, 10);
+
+	      this.stage.addChild(this.humanStrikeShapes[i]);
+	    }
+	  }
+
+	  printGameOver() {
+	    const frame = new createjs.Shape();
+	    frame.graphics
+	      .beginFill("#555")
+	      .drawRoundRect(275, 250, 250, 100, 5);
+
+	    const gameOver = new createjs.Text(`Game Over`, "42px Arial", "#FFF");
+	    gameOver.x = 290;
+	    gameOver.y = 315;
+	    gameOver.textBaseline = "alphabetic";
+
+	    const spaceText = new createjs.Text(`Click to restart`, "24px Arial", "#FFF8F0");
+	    spaceText.x = 320;
+	    spaceText.y = 550;
+	    spaceText.textBaseline = "alphabetic";
+
+	    this.stage.addChild(frame);
+	    this.stage.addChild(gameOver);
+	    this.stage.addChild(spaceText);
+
+	    this.stage.update();
+
+	    this.stage.on('mousedown', this.restart.bind(this));
+	  }
+
+	  printLevel() {
+	    const text = new createjs.Text(`Level ${this.level}`, "42px Arial", "#FFF8F0");
+	    text.x = 300;
+	    text.y = 300;
+	    text.textBaseline = "alphabetic";
+	    text.name = "level";
+
+	    this.stage.addChild(text);
+
+	    this.stage.update();
+	  }
+
 	  resetPieces(loser) {
 	    if(loser === 'cpu') {
 	      this.updateCpuStrikes();
 	    } else {
 	      this.updateHumanStrikes();
 	    }
+	  }
+
+	  restart() {
+	    this.stage.removeAllEventListeners();
+	    this.corridor.ticker.removeAllEventListeners();
+	    this.stage.removeAllChildren();
+
+	    this.cpuStrikes = 2;
+	    this.humanStrikes = 5;
+	    this.level = 1;
+
+	    this.corridor = new Corridor(this.stage, this);
+
+	    this.buildCpuScore();
+	    this.buildHumanScore();
+	    this.setStage();
 	  }
 
 	  setStage() {
@@ -116,61 +213,8 @@
 	    }
 	  }
 
-	  printGameOver() {
-	    const text = new createjs.Text("Game Over", "42px Arial", "#FFF8F0");
-	    text.x = 300;
-	    text.y = 300;
-	    text.textBaseline = "alphabetic";
-
-	    this.stage.addChild(text);
-
-	    this.stage.update();
-	  }
-
-	  buildCpuStrikes() {
-	    this.cpuStrikeShapes = [];
-	    for (let i = 0; i < this.cpuStrikes; i++) {
-	      this.cpuStrikeShapes[i] = new createjs.Shape();
-	      this.cpuStrikeShapes[i].graphics.beginFill("#F26430").drawCircle((160 + i * 25), 62, 10);
-
-	      this.stage.addChild(this.cpuStrikeShapes[i]);
-	    }
-	  }
-
-	  buildHumanStrikes() {
-	    this.humanStrikeShapes = [];
-	    for (let i = 0; i < this.humanStrikes; i++) {
-	      this.humanStrikeShapes[i] = new createjs.Shape();
-	      this.humanStrikeShapes[i].graphics.beginFill("#2176FF").drawCircle((630 - i * 25), 62, 10);
-
-	      this.stage.addChild(this.humanStrikeShapes[i]);
-	    }
-	  }
-
-	  buildCpuScore() {
-	    const text = new createjs.Text("CPU", "20px Arial", "#FFF8F0");
-	    text.x = 100;
-	    text.y = 70;
-	    text.textBaseline = "alphabetic";
-
-	    this.stage.addChild(text);
-	    this.buildCpuStrikes();
-
-	    this.stage.update();
-	  }
-
-	  buildHumanScore() {
-	    const text = new createjs.Text("Player", "20px Arial", "#FFF8F0");
-	    text.x = 650;
-	    text.y = 70;
-	    text.textBaseline = "alphabetic";
-
-	    this.stage.addChild(text);
-	    this.buildHumanStrikes();
-
-	    this.stage.update();
-	  }
 	}
+
 
 	const init = () => {
 	  const swervo = new Swervo;
@@ -408,6 +452,8 @@
 	  getSpin() {
 	    const ball = this.stage.getChildByName('ball');
 	    const humanPaddle = this.stage.getChildByName('humanPaddle');
+	    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
+
 	    ball.xSpin += humanPaddle.x - humanPaddle.prevX;
 	    ball.ySpin += humanPaddle.y - humanPaddle.prevY;
 	  }
@@ -453,8 +499,14 @@
 
 	  applySpin() {
 	    const ball = this.stage.getChildByName('ball');
-	    ball.xVelocity -= ball.xSpin / this.max_distance;
-	    ball.yVelocity -= ball.ySpin / this.max_distance;
+
+	    if (ball.direction === "out"){
+	      ball.xVelocity -= ball.xSpin / this.max_distance;
+	      ball.yVelocity -= ball.ySpin / this.max_distance;
+	    } else {
+	      ball.xVelocity += ball.xSpin / this.max_distance;
+	      ball.yVelocity += ball.ySpin / this.max_distance;
+	    }
 	  }
 
 	  applyVelocity() {
@@ -539,11 +591,31 @@
 	  }
 
 	  hitBall(e) {
-	    e.remove();
-	    this.getSpin();
-	    this.nearHit.play();
+	    const ball = this.stage.getChildByName('ball');
+	    const humanPaddle = this.stage.getChildByName('humanPaddle');
 
-	    this.ticker.addEventListener('tick', this.moveBall.bind(this));
+	    if (ball.x - 35 <= humanPaddle.x + 120
+	        && ball.x + 35 >= humanPaddle.x
+	        && ball.y - 35 <= humanPaddle.y + 60
+	        && ball.y + 35 >= humanPaddle.y) {
+	      e.remove();
+	      this.nearHit.load();
+	      this.nearHit.play();
+	      this.getSpin();
+	      if (ball.xSpin > 15) {
+	        ball.xSpin = 15;
+	      }
+	      if (ball.xSpin < -15) {
+	        ball.xSpin = -15;
+	      }
+	      if (ball.ySpin > 15) {
+	        ball.ySpin = 15;
+	      }
+	      if (ball.ySpin < -15) {
+	        ball.ySpin = -15;
+	      }
+	      this.ticker.addEventListener('tick', this.moveBall.bind(this));
+	    }
 	  }
 
 

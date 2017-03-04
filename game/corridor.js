@@ -223,6 +223,8 @@ class Corridor {
   getSpin() {
     const ball = this.stage.getChildByName('ball');
     const humanPaddle = this.stage.getChildByName('humanPaddle');
+    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
+
     ball.xSpin += humanPaddle.x - humanPaddle.prevX;
     ball.ySpin += humanPaddle.y - humanPaddle.prevY;
   }
@@ -268,8 +270,14 @@ class Corridor {
 
   applySpin() {
     const ball = this.stage.getChildByName('ball');
-    ball.xVelocity -= ball.xSpin / this.max_distance;
-    ball.yVelocity -= ball.ySpin / this.max_distance;
+
+    if (ball.direction === "out"){
+      ball.xVelocity -= ball.xSpin / this.max_distance;
+      ball.yVelocity -= ball.ySpin / this.max_distance;
+    } else {
+      ball.xVelocity += ball.xSpin / this.max_distance;
+      ball.yVelocity += ball.ySpin / this.max_distance;
+    }
   }
 
   applyVelocity() {
@@ -354,11 +362,31 @@ class Corridor {
   }
 
   hitBall(e) {
-    e.remove();
-    this.getSpin();
-    this.nearHit.play();
+    const ball = this.stage.getChildByName('ball');
+    const humanPaddle = this.stage.getChildByName('humanPaddle');
 
-    this.ticker.addEventListener('tick', this.moveBall.bind(this));
+    if (ball.x - 35 <= humanPaddle.x + 120
+        && ball.x + 35 >= humanPaddle.x
+        && ball.y - 35 <= humanPaddle.y + 60
+        && ball.y + 35 >= humanPaddle.y) {
+      e.remove();
+      this.nearHit.load();
+      this.nearHit.play();
+      this.getSpin();
+      if (ball.xSpin > 15) {
+        ball.xSpin = 15;
+      }
+      if (ball.xSpin < -15) {
+        ball.xSpin = -15;
+      }
+      if (ball.ySpin > 15) {
+        ball.ySpin = 15;
+      }
+      if (ball.ySpin < -15) {
+        ball.ySpin = -15;
+      }
+      this.ticker.addEventListener('tick', this.moveBall.bind(this));
+    }
   }
 
 
