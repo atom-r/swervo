@@ -199,7 +199,7 @@
 	      const level = this.stage.getChildByName('level');
 	      this.level += 1;
 	      level.text = `Level ${this.level}`
-	      this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.5;
+	      this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.4;
 	      this.cpuStrikes = 2;
 	      setTimeout( () => {
 	        this.corridor.max_distance -= 5
