@@ -4,6 +4,8 @@
 
 ![swervo](https://github.com/atom-r/swervo/blob/master/swervo.gif)
 
+[Swervo Live](http://www.adamjrichard.com/swervo)
+
 Swervo is a JavaScript remake of Curveball, a Flash creation from the early 2000s, which itself was a take on the arcade classic Pong. Curveball features a 3-D corridor (though players' paddles move only in 2-D) and allows players to put spin on the ball, curving it down the corridor toward the opponent's goal.
 
 ### Gameplay
@@ -52,7 +54,7 @@ Allowing the corridor's shapes to be updated on every 'tick':
 this.ticker.addEventListener('tick', this.moveBall.bind(this));
 ```
 
-####3D rendering
+####3D Rendering
 Two operations must be performed in order to give the impression that the ball is traveling in/out on the screen.
 
 First, the ball's size must scale with distance. After setting attributes on the ball to mark its current distance from the player and its direction of travel, adjustment of size is easily accomplished in Easel.
@@ -74,14 +76,17 @@ ball.x = ball.rawX - (ball.rawX - ball.farX) * ball.distance / this.max_distance
 ball.y = ball.rawY - (ball.rawY - ball.farY) * ball.distance / this.max_distance;
 ```
 
-####Lateral velocity and curving
+####Lateral Velocity and Curving
 Spin gets applied whenever the player's paddle strikes the ball. The paddle's previous position is subtracted from its current position, and this difference is added to the ball's spin vector.
 
 The ball's lateral velocity vector is constant unless the ball has a non-zero spin. The spin vector (scaled by the corridor's max_distance to prevent wild amounts of curve) gets added to the velocity vector every frame. This results in a nice acceleration effect when a spin is placed on the ball.
 
 Ball spin gets killed on wall bounces. This also helps to prevent wild amounts of ball spin.
 
-####AI paddle
+####AI Paddle
 The AI paddle is set to track the ball's raw position at all times. This is done by comparing the AI's raw position to the ball's raw position and then adjusting paddle position by an amount proportional to the difference between the two.
 
 For example, on Level 1, the AI paddle only makes up 1/35 of the distance between it and the ball on every frame. By Level 7, it's making up about 1/8 of that distance per frame.
+
+###Going Forward
+Swervo stands alone as an entertaining single-player game. Possible future plans for Swervo include PvP support, as well as a mobile implementation.
