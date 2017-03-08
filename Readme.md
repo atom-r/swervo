@@ -74,6 +74,13 @@ ball.x = ball.rawX - (ball.rawX - ball.farX) * ball.distance / this.max_distance
 ball.y = ball.rawY - (ball.rawY - ball.farY) * ball.distance / this.max_distance;
 ```
 
+####Lateral velocity and curving
+Spin gets applied whenever the player's paddle strikes the ball. The paddle's previous position is subtracted from its current position, and this difference is added to the ball's spin vector.
+
+The ball's lateral velocity vector is constant unless the ball has a non-zero spin. The spin vector (scaled by the corridor's max_distance to prevent wild amounts of curve) gets added to the velocity vector every frame. This results in a nice acceleration effect when a spin is placed on the ball.
+
+Ball spin gets killed on wall bounces. This also helps to prevent wild amounts of ball spin.
+
 ####AI paddle
 The AI paddle is set to track the ball's raw position at all times. This is done by comparing the AI's raw position to the ball's raw position and then adjusting paddle position by an amount proportional to the difference between the two.
 

@@ -371,8 +371,8 @@
 
 	    cpuPaddle.prevX = cpuPaddle.rawX;
 	    cpuPaddle.prevY = cpuPaddle.rawY;
-	    cpuPaddle.rawX += cpuDifX / (4 + this.cpuTrackingRatio);
-	    cpuPaddle.rawY += cpuDifY / (4 + this.cpuTrackingRatio);
+	    cpuPaddle.rawX += cpuDifX / (5 + this.cpuTrackingRatio);
+	    cpuPaddle.rawY += cpuDifY / (5 + this.cpuTrackingRatio);
 
 	    if (cpuPaddle.rawX > 249){
 	      cpuPaddle.rawX = 249;
