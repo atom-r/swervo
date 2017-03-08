@@ -2,67 +2,62 @@
 
 ### Background
 
+![swervo](https://github.com/atom-r/swervo/blob/master/swervo.gif)
+
 Swervo is a JavaScript remake of Curveball, a Flash creation from the early 2000s, which itself was a take on the arcade classic Pong. Curveball features a 3-D corridor (though players' paddles move only in 2-D) and allows players to put spin on the ball, curving it down the corridor toward the opponent's goal.
 
-As in the original, the game will be built for one player, who will use a mouse to control a paddle at the near end of the corridor. Should the ball land on the surface 'behind' the human player, he/she will receive a strike. If the computer puts 3 strikes by you, you're out.
+### Gameplay
 
-The ball will have an angular velocity variable ('spin') which will determine the strength of the curve. The magnitude and direction of the ball's spin will be determined whenever the ball contacts a paddle. That is, if the paddle is moving directly 'up' at when the ball makes contact, the ball will receive a topwise spin velocity proportional to the speed at which the paddle was moving.
+As of now, the only gameplay mode pits the human player, situated at the near end of the corridor, playing against an AI opponent. The player's objective is to progress as far as possible in the game given 6 "strikes". The game begins at Level 1, where the ball moves relatively slowly down the corridor, and the AI opponent does not track the gameball very well. Levels progress after every three goals against the AI.
 
-The computer opponent will track the ball as it travels up and down the corridor. Similar to Pong, the computer will not predict the ball's destination, but merely attempt to stay in front of it, limited by a max speed. The computer paddle will add angular velocity to the ball just as the human player's will.
+### Implementation
 
-If progress proceeds smoothly, a level system will be implemented, with difficulty level (i.e., computer player tracking speed) rising as the player progresses.
+Swervo is written in vanilla JavaScript, using the Easel.js API to render the corridor frame and the game's ball and paddles.
 
-### Functionality & MVP  
+####Drawing in Easel
 
-At a minimum, players will be able to:
+```JavaScript
+//corridor.js
+buildHumanPaddle() {
+  //set the the paddle colors and shape
+  const humanPaddle = new createjs.Shape();
+  humanPaddle.graphics
+    .beginStroke("#2176FF")
+    .setStrokeStyle(4)
+    .beginFill("#2176FF")
+    .drawRoundRect(0, 0, 120, 80, 10);
+  humanPaddle.alpha = 0.5;
+  humanPaddle.name = 'humanPaddle';
+  humanPaddle.prevX = 0;
+  humanPaddle.prevY = 0;
 
-- [ ] Move their paddle in 2-D space at the near end of the game corridor
-- [ ] Play against a computer opponent, positioned at the far end of the corridor
-- [ ] Put some 'english' on the swervo ball by changing its angular momentum when striking it
-- [ ] Play until one of the players reaches three strikes
+  //append the shape to the stage
+  this.stage.addChild(humanPaddle);
+  //must later call stage.update() in order to render all children
+}
+```
 
-In addition, this project will include:
+Easel.js provides a Ticker object, and an associated 'tick' event, which can be used to set a game clock.
 
-- [ ] A production README
+```JavaScript
+// corridor.js
+this.ticker = createjs.Ticker;
+this.ticker.setFPS(60);
+```
 
-### Wireframes
+Allowing the corridor's shapes to be updated on every 'tick':
 
-This app will consist of a single screen with game board, and nav links to Github, LinkedIn,
-and the About modal.  The player will click 'Start' on the main screen to load the corridor, paddles, and ball. The ball starts in front of the human player, who will click to initiate action.
+```JavaScript
+  //the same listener calls this.movePaddles elsewhere
+  this.ticker.addEventListener('tick', this.moveBall.bind(this));
+```
 
-![wireframes](https://github.com/atom-r/swervo/blob/master/swervo.png)
+####3D rendering
+The ball has direction of travel and distance attributes. Distance increments with every frame. When the ball reaches one of the ends of the corridor, ball.direction flips from "in" to "out" or vice versa.
 
-### Architecture and Technologies
+The ball's size is scaled in Easel based on its current distance.
 
-This project will be implemented with the following technologies:
-
-- Vanilla JavaScript for game physics computations
-- `HTML5 Canvas` for rendering the corridor and pieces (paddles and game ball)
-- CSS for general styling around the game display and in the About modal
-- Webpack for bundling the following script files
-
-In addition to the webpack entry file, there will be three scripts involved in this project:
-
-`corridor.js`: this script will create, update, and render the corridor, paddles, game ball
-
-`computer_player.js`: this script will control tracking of ball position and updating the computer player's paddle position
-
-`swervo.js`: this script will control the refresh rate, compute ball velocity and scoring, and reset pieces after a scoring event
-
-### Implementation Timeline
-
-**Day 1**: Review HTML5 Canvas and construct the corridor and its aforementioned game pieces, including an event listener which will cause the player's paddle to track the cursor inside the game display. This will require fleshing out most of 'corridor.js' as outlined above, and a skeleton version of 'swervo.js'.
-
-- Get a game board rendered and responsive to player input, and nail down the change in apparent game ball size depending on its distance from the near end of the corridor
-
-**Days 2 and 3**: Build out the game physics, including ball speed up and down the corridor as well as lateral movement due to spin, momentum, and deflection off of corridor walls.
-
-- Begin without implementing spin. Set the board up as described previously, click to start, and make the ball travel from one end of the corridor to the other, updating the ball's apparent size along the way
-- Get a playable ball velocity nailed down
-- Complete 'computer_player.js'
-- Add 'spin', including proper response as a spinning ball deflects off a wall (Note: ball speed along the corridor will be constant, regardless of spin)
-
-**Day 4**: Add scoring, start screen, and complete styling around the game display.
+The ball's screen position must also be shifted in order to adjust for 3D perspective.
 
 
 ### Bonus features
