@@ -53,9 +53,9 @@ this.ticker.addEventListener('tick', this.moveBall.bind(this));
 ```
 
 ####3D rendering
-The ball has direction of travel and distance attributes. Two operations must be performed in order to give the impression that the ball is traveling in/out on the screen.
+Two operations must be performed in order to give the impression that the ball is traveling in/out on the screen.
 
-First, the ball's size must scale with distance. After setting attributes on the ball to mark current distance from the player and direction travel, adjustment of size is easily accomplished in Easel.
+First, the ball's size must scale with distance. After setting attributes on the ball to mark its current distance from the player and its direction of travel, adjustment of size is easily accomplished in Easel.
 
 ```JavaScript
 //scales the ball to a quarter of its original size at max_distance
