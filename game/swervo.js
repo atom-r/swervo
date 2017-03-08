@@ -14,6 +14,7 @@ class Swervo {
 
     this.buildCpuScore();
     this.buildHumanScore();
+    this.printInstructions();
     this.printLevel();
     this.setStage();
   }
@@ -87,6 +88,16 @@ class Swervo {
     this.stage.on('mousedown', this.restart.bind(this));
   }
 
+  printInstructions() {
+    const text = new createjs.Text("To curve: sweep the paddle over the ball as it hits", "16px Arial", "#FFF8F0");
+    text.x = 230;
+    text.y = 25;
+    text.textBaseline = "alphabetic";
+    text.name = 'instructions';
+
+    this.stage.addChild(text);
+  }
+
   printLevel() {
     const text = new createjs.Text(`Level ${this.level}`, "24px Arial", "#FFF8F0");
     text.x = 363;
@@ -133,8 +144,8 @@ class Swervo {
     ball.y = 300;
     ball.rawX = 400;
     ball.rawY = 300;
-    ball.xVelocity = 0;
-    ball.yVelocity = 0;
+    ball.xVelocity = -0.5;
+    ball.yVelocity = 0.5;
     ball.direction = "out";
     ball.distance = 0;
     ball.scaleX = 1;
@@ -153,10 +164,14 @@ class Swervo {
       const level = this.stage.getChildByName('level');
       this.level += 1;
       level.text = `Level ${this.level}`
+      if (this.level === 2) {
+        const instructions = this.stage.getChildByName('instructions');
+        if (instructions) instructions.text = "";
+      }
       this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.4 ;
       this.cpuStrikes = 2;
       setTimeout( () => {
-        this.corridor.max_distance -= 5
+        this.corridor.max_distance = Math.floor(this.corridor.max_distance * 0.95);
       }, 1000);
       setTimeout(this.buildCpuStrikes.bind(this), 1000);
     }
@@ -172,7 +187,6 @@ class Swervo {
       this.printGameOver();
     }
   }
-
 }
 
 

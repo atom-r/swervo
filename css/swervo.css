@@ -1,10 +1,68 @@
-@background: #1E1E24;
-@human: #111D4A;
-@borders: #FFF8F0;
-@ball: #FFCF99;
-@opponent: #92140C;
+html, body, div, span, i, h2{
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: 400;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: sans-serif;
+  vertical-align: baseline;
+  color: #1E1E24;
+  overflow: hidden;
+  background-color: #999;
+}
 
-#myCanvas {
-  border: 1px solid black;
+html {
+  display: flex;
+  justify-content: center;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 800px;
+}
+
+.title {
+  margin-top: 100px;
+  text-align: center;
+  font-size: 24px;
+}
+
+canvas {
+  width: 800px;
+  height: 600px;
+  min-width: 800px;
+  min-height: 600px;
+  max-width: 800px;
+  max-height: 600px;
   background-color: #1E1E24;
+  border-radius: 10px;
+}
+
+.btm-text {
+  display: flex;
+  justify-content: space-around;
+}
+
+.links {
+  display: flex;
+  font-size: 14px;
+  width: 600px;
+  justify-content: space-between;
+}
+
+.fa-github {
+  position: relative;
+  top: 2px;
+}
+
+a:visited {
+  color: #000;
+}
+
+.github {
+  float: right;
 }
