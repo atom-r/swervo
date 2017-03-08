@@ -37,7 +37,7 @@ buildHumanPaddle() {
 }
 ```
 
-Easel.js provides a Ticker object, and an associated 'tick' event, which can be used to set a game clock.
+Easel.js provides a Ticker object, and an associated 'tick' event, which are used to set a game clock.
 
 ```JavaScript
 // corridor.js
@@ -48,19 +48,33 @@ this.ticker.setFPS(60);
 Allowing the corridor's shapes to be updated on every 'tick':
 
 ```JavaScript
-  //the same listener calls this.movePaddles elsewhere
-  this.ticker.addEventListener('tick', this.moveBall.bind(this));
+//the same listener calls this.movePaddles elsewhere
+this.ticker.addEventListener('tick', this.moveBall.bind(this));
 ```
 
 ####3D rendering
-The ball has direction of travel and distance attributes. Distance increments with every frame. When the ball reaches one of the ends of the corridor, ball.direction flips from "in" to "out" or vice versa.
+The ball has direction of travel and distance attributes. Two operations must be performed in order to give the impression that the ball is traveling in/out on the screen.
 
-The ball's size is scaled in Easel based on its current distance.
+First, the ball's size must scale with distance. After setting attributes on the ball to mark current distance from the player and direction travel, adjustment of size is easily accomplished in Easel.
 
-The ball's screen position must also be shifted in order to adjust for 3D perspective.
+```JavaScript
+//scales the ball to a quarter of its original size at max_distance
+ball.scaleX = 1 - ball.distance * 3 / (4 * this.max_distance);
+ball.scaleY = 1 - ball.distance * 3 / (4 * this.max_distance);
+```
 
+Second, the ball's position on the screen must be adjusted to account for 3D perspective. This was perhaps the most challenging aspect of writing Swervo. My solution stores the ball's "raw" 2-dimensional positions. That is, the coordinates at which the ball would be rendered if it were at a distance of 0.
 
-### Bonus features
+From there, the game calculates where the ball would be rendered at the far end of the corridor. These near and far positions can be thought of as endpoints on a line that extends into the screen. As the ball's distance increases, it travels "down" this line toward the far endpoint.
 
-- [ ] Ascending difficulty levels and altered scoring system, allowing the player 5 total strikes
-- [ ] Accompanying 8-bit soundtrack with mute capability
+```JavaScript
+//note that at ball.distance = 0, ball.x = ball.rawX
+//and at ball.distance = max_distance, ball.x = ball.farX
+ball.x = ball.rawX - (ball.rawX - ball.farX) * ball.distance / this.max_distance;
+ball.y = ball.rawY - (ball.rawY - ball.farY) * ball.distance / this.max_distance;
+```
+
+####AI paddle
+The AI paddle is set to track the ball's raw position at all times. This is done by comparing the AI's raw position to the ball's raw position and then adjusting paddle position by an amount proportional to the difference between the two.
+
+For example, on Level 1, the AI paddle only makes up 1/35 of the distance between it and the ball on every frame. By Level 7, it's making up about 1/8 of that distance per frame.
