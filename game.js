@@ -201,7 +201,6 @@
 	      level.text = `Level ${this.level}`
 	      this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.5;
 	      this.cpuStrikes = 2;
-	      console.log(this.level);
 	      setTimeout( () => {
 	        this.corridor.max_distance -= 5
 	      }, 1000);
