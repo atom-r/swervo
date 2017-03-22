@@ -1,4 +1,5 @@
 const Corridor = require('./corridor.js')
+const Ball = require('./ball.js')
 
 class Swervo {
 
@@ -138,19 +139,7 @@ class Swervo {
   setStage() {
     const ballMarker = this.stage.getChildByName('ballMarker');
 
-    this.corridor.ballFillCommand.style = this.corridor.ballGradient;
-    this.corridor.ball.x = 400;
-    this.corridor.ball.y = 300;
-    this.corridor.ball.rawX = this.corridor.ball.x;
-    this.corridor.ball.rawY = this.corridor.ball.y;
-    this.corridor.ball.xVelocity = 0;
-    this.corridor.ball.yVelocity = 0;
-    this.corridor.ball.direction = "out";
-    this.corridor.ball.distance = 0;
-    this.corridor.ball.scaleX = 1;
-    this.corridor.ball.scaleY = 1;
-    this.corridor.ball.xSpin = 5;
-    this.corridor.ball.ySpin = 0;
+    this.corridor.ball.reset();
     ballMarker.graphics.clear().beginStroke("#009B72").drawRect(88, 91, 624, 418);
     this.stage.on('stagemousedown', this.corridor.hitBall.bind(this.corridor));
   }
@@ -170,7 +159,8 @@ class Swervo {
       this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.4 ;
       this.cpuStrikes = 2;
       setTimeout( () => {
-        this.corridor.max_distance = Math.floor(this.corridor.max_distance * 0.95);
+        this.corridor.ball.maxDistance = Math.floor(this.corridor.ball.maxDistance * 0.95);
+        this.corridor.max_distance = this.corridor.ball.maxDistance;
       }, 1000);
       setTimeout(this.buildCpuStrikes.bind(this), 1000);
     }

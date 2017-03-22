@@ -45,6 +45,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	const Corridor = __webpack_require__(1)
+	const Ball = __webpack_require__(2)
 
 	class Swervo {
 
@@ -184,19 +185,7 @@
 	  setStage() {
 	    const ballMarker = this.stage.getChildByName('ballMarker');
 
-	    this.corridor.ballFillCommand.style = this.corridor.ballGradient;
-	    this.corridor.ball.x = 400;
-	    this.corridor.ball.y = 300;
-	    this.corridor.ball.rawX = this.corridor.ball.x;
-	    this.corridor.ball.rawY = this.corridor.ball.y;
-	    this.corridor.ball.xVelocity = 0;
-	    this.corridor.ball.yVelocity = 0;
-	    this.corridor.ball.direction = "out";
-	    this.corridor.ball.distance = 0;
-	    this.corridor.ball.scaleX = 1;
-	    this.corridor.ball.scaleY = 1;
-	    this.corridor.ball.xSpin = 5;
-	    this.corridor.ball.ySpin = 0;
+	    this.corridor.ball.reset();
 	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(88, 91, 624, 418);
 	    this.stage.on('stagemousedown', this.corridor.hitBall.bind(this.corridor));
 	  }
@@ -216,7 +205,8 @@
 	      this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.4 ;
 	      this.cpuStrikes = 2;
 	      setTimeout( () => {
-	        this.corridor.max_distance = Math.floor(this.corridor.max_distance * 0.95);
+	        this.corridor.ball.maxDistance = Math.floor(this.corridor.ball.maxDistance * 0.95);
+	        this.corridor.max_distance = this.corridor.ball.maxDistance;
 	      }, 1000);
 	      setTimeout(this.buildCpuStrikes.bind(this), 1000);
 	    }
@@ -244,7 +234,9 @@
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	const Ball = __webpack_require__(2)
 
 	CENTER_X = 400;
 	CENTER_Y = 300;
@@ -254,6 +246,7 @@
 	  constructor(stage, swervo) {
 	    this.stage = stage;
 	    this.swervo = swervo;
+	    this.ball = new Ball(this.stage, 60);
 
 	    this.max_distance = 60;
 	    this.cpuTrackingRatio = 30;
@@ -269,7 +262,32 @@
 
 	    this.renderCorridor();
 	    this.renderPieces();
+	  }
 
+	  detectWallBounce() {
+	    if(this.ball.rawX >= 712 || this.ball.rawX <= 88){
+	      this.ball.xVelocity = this.ball.xVelocity * -1;
+	      this.ball.xSpin = 0;
+	      this.vWallHit.load();
+	      this.vWallHit.play();
+	    }
+
+	    if(this.ball.rawY >= 509 || this.ball.rawY <= 91){
+	      this.ball.yVelocity = this.ball.yVelocity * -1;
+	      this.ball.ySpin = 0;
+	      this.hWallHit.load();
+	      this.hWallHit.play();
+	    }
+	  }
+
+	  detectGoalOrHit() {
+	    if (this.ball.distance === this.max_distance){
+	      this.detectCpuHit();
+	      this.ball.direction = "in";
+	    } else if (this.ball.distance === 0){
+	      this.detectHumanHit();
+	      this.ball.direction = "out";
+	    }
 	  }
 
 	  drawRectangle(shape, { x, y, w, h }) {
@@ -323,17 +341,16 @@
 	    this.stage.addChild(cpuPaddle);
 	  }
 
-	  buildBall() {
-	    this.ball = new createjs.Shape();
-	    this.ballFillCommand = this.ball
-	      .graphics
-	      .beginRadialGradientFill(["#EEE","#444"], [0, 1], 15, -15, 0, 0, 0, 35).command;
-	    this.ballGradient = this.ballFillCommand.style;
-	    this.ball.graphics.drawCircle(0, 0, 35);
-
-	    this.drawBallMarker();
-	    this.stage.addChild(this.ball);
-	  }
+	  // buildBall() {
+	  //   this.ball = new createjs.Shape();
+	  //   this.ballFillCommand = this.ball
+	  //     .graphics
+	  //     .beginRadialGradientFill(["#EEE","#444"], [0, 1], 15, -15, 0, 0, 0, 35).command;
+	  //   this.ballGradient = this.ballFillCommand.style;
+	  //   this.ball.graphics.drawCircle(0, 0, 35);
+	  //
+	  //   this.stage.addChild(this.ball);
+	  // }
 
 	  drawBallMarker() {
 	    const ballMarker = new createjs.Shape();
@@ -408,8 +425,9 @@
 
 	  renderPieces() {
 	    this.buildCpuPaddle();
-	    this.buildBall();
+	    this.ball.draw();
 	    this.buildHumanPaddle();
+	    this.drawBallMarker();
 
 	    this.ticker.addEventListener('tick', this.movePaddles.bind(this));
 	  }
@@ -450,15 +468,15 @@
 
 	  detectHumanHit() {
 	    const humanPaddle = this.stage.getChildByName('humanPaddle');
-	    if (this.ball.x - (this.ball.radius) <= humanPaddle.x + 120
-	        && this.ball.x + (this.ball.radius) >= humanPaddle.x
-	        && this.ball.y - (this.ball.radius) <= humanPaddle.y + 60
-	        && this.ball.y + (this.ball.radius) >= humanPaddle.y) {
+	    if (this.ball.shape.x - (this.ball.radius) <= humanPaddle.x + 120
+	        && this.ball.shape.x + (this.ball.radius) >= humanPaddle.x
+	        && this.ball.shape.y - (this.ball.radius) <= humanPaddle.y + 60
+	        && this.ball.shape.y + (this.ball.radius) >= humanPaddle.y) {
 	      this.nearHit.load();
 	      this.nearHit.play();
 	      this.getSpin();
 	    } else {
-	      this.ballFillCommand.style = "#F26430";
+	      this.ball.fillCommand.style = "#F26430";
 	      this.goal.load();
 	      this.goal.play();
 	      this.ticker.removeAllEventListeners('tick');
@@ -477,14 +495,14 @@
 
 	  detectCpuHit() {
 	    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-	    if (this.ball.x - 400 - (this.ball.radius) <= cpuPaddle.x + 15
-	        && this.ball.x - 400 + (this.ball.radius) >= cpuPaddle.x - 15
-	        && this.ball.y - 300 - (this.ball.radius) <= cpuPaddle.y + 10
-	        && this.ball.y - 300 + (this.ball.radius) >= cpuPaddle.y - 10) {
+	    if (this.ball.shape.x - 400 - (this.ball.radius) <= cpuPaddle.x + 15
+	        && this.ball.shape.x - 400 + (this.ball.radius) >= cpuPaddle.x - 15
+	        && this.ball.shape.y - 300 - (this.ball.radius) <= cpuPaddle.y + 10
+	        && this.ball.shape.y - 300 + (this.ball.radius) >= cpuPaddle.y - 10) {
 	      this.farHit.load();
 	      this.farHit.play();
 	    } else {
-	      this.ballFillCommand.style = "#2176FF";
+	      this.ball.fillCommand.style = "#2176FF";
 	      this.goal.load();
 	      this.goal.play();
 	      this.ticker.removeAllEventListeners('tick');
@@ -504,107 +522,13 @@
 	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(markerX, markerY, markerW, markerH);
 	  }
 
-	  scaleBall() {
-	    this.ball.scaleX = 1 - this.ball.distance * 3 / (4 * this.max_distance);
-	    this.ball.scaleY = 1 - this.ball.distance * 3 / (4 * this.max_distance);
-
-	    this.ball.radius = 35 * this.ball.scaleX;
-	  }
-
-	  applySpin() {
-
-	    if (this.ball.direction === "out"){
-	      this.ball.xVelocity -= this.ball.xSpin / this.max_distance;
-	      this.ball.yVelocity -= this.ball.ySpin / this.max_distance;
-	    } else {
-	      this.ball.xVelocity += this.ball.xSpin / this.max_distance;
-	      this.ball.yVelocity += this.ball.ySpin / this.max_distance;
-	    }
-	  }
-
-	  applyVelocity() {
-	    this.ball.rawX += this.ball.xVelocity;
-	    this.ball.farX = (this.ball.rawX - 400) * 79/312 + 400;
-
-	    this.ball.rawY += this.ball.yVelocity;
-	    this.ball.farY = (this.ball.rawY - 300) * 53/209 + 300;
-	  }
-
-	  detectWallBounce() {
-
-	    if(this.ball.rawX >= 712 || this.ball.rawX <= 88){
-	      this.ball.xVelocity = this.ball.xVelocity * -1;
-	      this.ball.xSpin = 0;
-	      this.vWallHit.load();
-	      this.vWallHit.play();
-	    }
-
-	    if(this.ball.rawY >= 509 || this.ball.rawY <= 91){
-	      this.ball.yVelocity = this.ball.yVelocity * -1;
-	      this.ball.ySpin = 0;
-	      this.hWallHit.load();
-	      this.hWallHit.play();
-	    }
-	  }
-
-	  applyPerspective() {
-
-	    this.ball.x = this.ball.rawX - (this.ball.rawX - this.ball.farX) * this.ball.distance / this.max_distance;
-	    this.ball.y = this.ball.rawY - (this.ball.rawY - this.ball.farY) * this.ball.distance / this.max_distance;
-
-
-	    //these lines shift the ball slightly so it doesn't appear to be out of bounds
-	    if (this.ball.rawX > 400) {
-	      this.ball.x -= this.ball.radius * (this.ball.rawX - 400)/312;
-	    } else if (this.ball.rawX < 400) {
-	      this.ball.x += this.ball.radius * (400 - this.ball.rawX)/312;
-	    }
-
-	    if (this.ball.rawY > 300) {
-	      this.ball.y -= this.ball.radius * (this.ball.rawY - 300)/209;
-	    } else if (this.ball.rawY < 300) {
-	      this.ball.y += this.ball.radius * (300 - this.ball.rawY)/209;
-	    }
-	  }
-
-	  updateDistance() {
-	    if (this.ball.direction === "out"){
-	      this.ball.distance += 1;
-	    } else {
-	      this.ball.distance -= 1;
-	    }
-	  }
-
-	  detectGoalOrHit() {
-	    if (this.ball.distance === this.max_distance){
-	      this.detectCpuHit();
-	      this.ball.direction = "in";
-	    } else if (this.ball.distance === 0){
-	      this.detectHumanHit();
-	      this.ball.direction = "out";
-	    }
-	  }
-
-	  moveBall() {
-	    this.updateDistance();
-	    this.updateBallMarker();
-	    this.scaleBall();
-	    this.detectGoalOrHit();
-	    this.detectWallBounce();
-	    this.applySpin();
-	    this.applyVelocity();
-	    this.applyPerspective();
-
-	    this.stage.update();
-	  }
 
 	  hitBall(e) {
 	    const humanPaddle = this.stage.getChildByName('humanPaddle');
-
-	    if (this.ball.x - 35 <= humanPaddle.x + 120
-	        && this.ball.x + 35 >= humanPaddle.x
-	        && this.ball.y - 35 <= humanPaddle.y + 60
-	        && this.ball.y + 35 >= humanPaddle.y) {
+	    if (this.ball.shape.x - 35 <= humanPaddle.x + 120
+	        && this.ball.shape.x + 35 >= humanPaddle.x
+	        && this.ball.shape.y - 35 <= humanPaddle.y + 60
+	        && this.ball.shape.y + 35 >= humanPaddle.y) {
 	      e.remove();
 	      this.nearHit.load();
 	      this.nearHit.play();
@@ -621,14 +545,138 @@
 	      if (this.ball.ySpin < -15) {
 	        this.ball.ySpin = -15;
 	      }
-	      this.ticker.addEventListener('tick', this.moveBall.bind(this));
+	      this.ticker.addEventListener('tick', this.doTheStuff.bind(this));
 	    }
+	  }
+
+	  doTheStuff() {
+	    this.ball.move();
+	    this.detectWallBounce();
+	    this.detectGoalOrHit();
+	    this.updateBallMarker();
 	  }
 
 
 	}
 
 	module.exports = Corridor;
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	INITIAL_RADIUS = 35;
+
+	class Ball {
+
+	  constructor(stage, maxDistance) {
+	    this.stage = stage;
+	    this.maxDistance = maxDistance;
+
+	    this.shape = new createjs.Shape();
+
+	    this.reset();
+	  }
+
+	  adjustForRadius() {
+	    if (this.rawX > 400) {
+	      this.shape.x -= this.radius * (this.rawX - 400)/312;
+	    } else if (this.rawX < 400) {
+	      this.shape.x += this.radius * (400 - this.rawX)/312;
+	    }
+
+	    if (this.rawY > 300) {
+	      this.shape.y -= this.radius * (this.rawY - 300)/209;
+	    } else if (this.rawY < 300) {
+	      this.shape.y += this.radius * (300 - this.rawY)/209;
+	    }
+	  }
+
+	  applyPerspective() {
+	    const distanceFactor = this.distance / this.maxDistance;
+
+	    this.shape.x = this.rawX - (this.rawX - this.farX) * distanceFactor;
+	    this.shape.y = this.rawY - (this.rawY - this.farY) * distanceFactor;
+	  }
+
+	  applySpin() {
+	    if (this.direction === "out"){
+	      this.xVelocity -= this.xSpin / this.maxDistance;
+	      this.yVelocity -= this.ySpin / this.maxDistance;
+	    } else {
+	      this.xVelocity += this.xSpin / this.maxDistance;
+	      this.yVelocity += this.ySpin / this.maxDistance;
+	    }
+	  }
+
+	  applyVelocity() {
+	    this.rawX += this.xVelocity;
+	    this.farX = (this.rawX - 400) * 79/312 + 400;
+
+	    this.rawY += this.yVelocity;
+	    this.farY = (this.rawY - 300) * 53/209 + 300;
+	  }
+
+	  draw() {
+	    this.fillCommand = this.shape
+	      .graphics
+	      .beginRadialGradientFill(["#EEE","#444"], [0, 1], 15, -15, 0, 0, 0, 35).command;
+	    this.silverGradient = this.fillCommand.style;
+	    this.shape.graphics.drawCircle(0, 0, INITIAL_RADIUS);
+
+	    this.stage.addChild(this.shape);
+	  }
+
+	  move() {
+	    this.updateDistance();
+	    this.scaleBall();
+	    this.applySpin();
+	    this.applyVelocity();
+	    this.applyPerspective();
+	    this.adjustForRadius();
+
+	    this.stage.update();
+	  }
+
+	  reset() {
+	    this.shape.x = 400;
+	    this.shape.y = 300;
+
+	    this.distance = 0;
+	    this.direction = "out";
+	    this.radius = INITIAL_RADIUS;
+
+	    this.xVelocity = 0;
+	    this.yVelocity = 0;
+
+	    this.xSpin = 0;
+	    this.ySpin = 0;
+
+	    this.rawX = 400;
+	    this.rawY = 300;
+
+	    this.shape.scaleX = 1;
+	    this.shape.scaleY = 1;
+	  }
+
+	  scaleBall() {
+	    this.shape.scaleX = 1 - this.distance * 3 / (4 * this.maxDistance);
+	    this.shape.scaleY = 1 - this.distance * 3 / (4 * this.maxDistance);
+
+	    this.radius = 35 * this.shape.scaleX;
+	  }
+
+	  updateDistance() {
+	    if (this.direction === "out"){
+	      this.distance += 1;
+	    } else {
+	      this.distance -= 1;
+	    }
+	  }
+	}
+
+	module.exports = Ball;
 
 
 /***/ }

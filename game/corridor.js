@@ -1,3 +1,5 @@
+const Ball = require('./ball.js')
+
 CENTER_X = 400;
 CENTER_Y = 300;
 
@@ -6,6 +8,7 @@ class Corridor {
   constructor(stage, swervo) {
     this.stage = stage;
     this.swervo = swervo;
+    this.ball = new Ball(this.stage, 60);
 
     this.max_distance = 60;
     this.cpuTrackingRatio = 30;
@@ -21,7 +24,32 @@ class Corridor {
 
     this.renderCorridor();
     this.renderPieces();
+  }
 
+  detectWallBounce() {
+    if(this.ball.rawX >= 712 || this.ball.rawX <= 88){
+      this.ball.xVelocity = this.ball.xVelocity * -1;
+      this.ball.xSpin = 0;
+      this.vWallHit.load();
+      this.vWallHit.play();
+    }
+
+    if(this.ball.rawY >= 509 || this.ball.rawY <= 91){
+      this.ball.yVelocity = this.ball.yVelocity * -1;
+      this.ball.ySpin = 0;
+      this.hWallHit.load();
+      this.hWallHit.play();
+    }
+  }
+
+  detectGoalOrHit() {
+    if (this.ball.distance === this.max_distance){
+      this.detectCpuHit();
+      this.ball.direction = "in";
+    } else if (this.ball.distance === 0){
+      this.detectHumanHit();
+      this.ball.direction = "out";
+    }
   }
 
   drawRectangle(shape, { x, y, w, h }) {
@@ -75,17 +103,16 @@ class Corridor {
     this.stage.addChild(cpuPaddle);
   }
 
-  buildBall() {
-    this.ball = new createjs.Shape();
-    this.ballFillCommand = this.ball
-      .graphics
-      .beginRadialGradientFill(["#EEE","#444"], [0, 1], 15, -15, 0, 0, 0, 35).command;
-    this.ballGradient = this.ballFillCommand.style;
-    this.ball.graphics.drawCircle(0, 0, 35);
-
-    this.drawBallMarker();
-    this.stage.addChild(this.ball);
-  }
+  // buildBall() {
+  //   this.ball = new createjs.Shape();
+  //   this.ballFillCommand = this.ball
+  //     .graphics
+  //     .beginRadialGradientFill(["#EEE","#444"], [0, 1], 15, -15, 0, 0, 0, 35).command;
+  //   this.ballGradient = this.ballFillCommand.style;
+  //   this.ball.graphics.drawCircle(0, 0, 35);
+  //
+  //   this.stage.addChild(this.ball);
+  // }
 
   drawBallMarker() {
     const ballMarker = new createjs.Shape();
@@ -160,8 +187,9 @@ class Corridor {
 
   renderPieces() {
     this.buildCpuPaddle();
-    this.buildBall();
+    this.ball.draw();
     this.buildHumanPaddle();
+    this.drawBallMarker();
 
     this.ticker.addEventListener('tick', this.movePaddles.bind(this));
   }
@@ -202,15 +230,15 @@ class Corridor {
 
   detectHumanHit() {
     const humanPaddle = this.stage.getChildByName('humanPaddle');
-    if (this.ball.x - (this.ball.radius) <= humanPaddle.x + 120
-        && this.ball.x + (this.ball.radius) >= humanPaddle.x
-        && this.ball.y - (this.ball.radius) <= humanPaddle.y + 60
-        && this.ball.y + (this.ball.radius) >= humanPaddle.y) {
+    if (this.ball.shape.x - (this.ball.radius) <= humanPaddle.x + 120
+        && this.ball.shape.x + (this.ball.radius) >= humanPaddle.x
+        && this.ball.shape.y - (this.ball.radius) <= humanPaddle.y + 60
+        && this.ball.shape.y + (this.ball.radius) >= humanPaddle.y) {
       this.nearHit.load();
       this.nearHit.play();
       this.getSpin();
     } else {
-      this.ballFillCommand.style = "#F26430";
+      this.ball.fillCommand.style = "#F26430";
       this.goal.load();
       this.goal.play();
       this.ticker.removeAllEventListeners('tick');
@@ -229,14 +257,14 @@ class Corridor {
 
   detectCpuHit() {
     const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-    if (this.ball.x - 400 - (this.ball.radius) <= cpuPaddle.x + 15
-        && this.ball.x - 400 + (this.ball.radius) >= cpuPaddle.x - 15
-        && this.ball.y - 300 - (this.ball.radius) <= cpuPaddle.y + 10
-        && this.ball.y - 300 + (this.ball.radius) >= cpuPaddle.y - 10) {
+    if (this.ball.shape.x - 400 - (this.ball.radius) <= cpuPaddle.x + 15
+        && this.ball.shape.x - 400 + (this.ball.radius) >= cpuPaddle.x - 15
+        && this.ball.shape.y - 300 - (this.ball.radius) <= cpuPaddle.y + 10
+        && this.ball.shape.y - 300 + (this.ball.radius) >= cpuPaddle.y - 10) {
       this.farHit.load();
       this.farHit.play();
     } else {
-      this.ballFillCommand.style = "#2176FF";
+      this.ball.fillCommand.style = "#2176FF";
       this.goal.load();
       this.goal.play();
       this.ticker.removeAllEventListeners('tick');
@@ -256,107 +284,13 @@ class Corridor {
     ballMarker.graphics.clear().beginStroke("#009B72").drawRect(markerX, markerY, markerW, markerH);
   }
 
-  scaleBall() {
-    this.ball.scaleX = 1 - this.ball.distance * 3 / (4 * this.max_distance);
-    this.ball.scaleY = 1 - this.ball.distance * 3 / (4 * this.max_distance);
-
-    this.ball.radius = 35 * this.ball.scaleX;
-  }
-
-  applySpin() {
-
-    if (this.ball.direction === "out"){
-      this.ball.xVelocity -= this.ball.xSpin / this.max_distance;
-      this.ball.yVelocity -= this.ball.ySpin / this.max_distance;
-    } else {
-      this.ball.xVelocity += this.ball.xSpin / this.max_distance;
-      this.ball.yVelocity += this.ball.ySpin / this.max_distance;
-    }
-  }
-
-  applyVelocity() {
-    this.ball.rawX += this.ball.xVelocity;
-    this.ball.farX = (this.ball.rawX - 400) * 79/312 + 400;
-
-    this.ball.rawY += this.ball.yVelocity;
-    this.ball.farY = (this.ball.rawY - 300) * 53/209 + 300;
-  }
-
-  detectWallBounce() {
-
-    if(this.ball.rawX >= 712 || this.ball.rawX <= 88){
-      this.ball.xVelocity = this.ball.xVelocity * -1;
-      this.ball.xSpin = 0;
-      this.vWallHit.load();
-      this.vWallHit.play();
-    }
-
-    if(this.ball.rawY >= 509 || this.ball.rawY <= 91){
-      this.ball.yVelocity = this.ball.yVelocity * -1;
-      this.ball.ySpin = 0;
-      this.hWallHit.load();
-      this.hWallHit.play();
-    }
-  }
-
-  applyPerspective() {
-
-    this.ball.x = this.ball.rawX - (this.ball.rawX - this.ball.farX) * this.ball.distance / this.max_distance;
-    this.ball.y = this.ball.rawY - (this.ball.rawY - this.ball.farY) * this.ball.distance / this.max_distance;
-
-
-    //these lines shift the ball slightly so it doesn't appear to be out of bounds
-    if (this.ball.rawX > 400) {
-      this.ball.x -= this.ball.radius * (this.ball.rawX - 400)/312;
-    } else if (this.ball.rawX < 400) {
-      this.ball.x += this.ball.radius * (400 - this.ball.rawX)/312;
-    }
-
-    if (this.ball.rawY > 300) {
-      this.ball.y -= this.ball.radius * (this.ball.rawY - 300)/209;
-    } else if (this.ball.rawY < 300) {
-      this.ball.y += this.ball.radius * (300 - this.ball.rawY)/209;
-    }
-  }
-
-  updateDistance() {
-    if (this.ball.direction === "out"){
-      this.ball.distance += 1;
-    } else {
-      this.ball.distance -= 1;
-    }
-  }
-
-  detectGoalOrHit() {
-    if (this.ball.distance === this.max_distance){
-      this.detectCpuHit();
-      this.ball.direction = "in";
-    } else if (this.ball.distance === 0){
-      this.detectHumanHit();
-      this.ball.direction = "out";
-    }
-  }
-
-  moveBall() {
-    this.updateDistance();
-    this.updateBallMarker();
-    this.scaleBall();
-    this.detectGoalOrHit();
-    this.detectWallBounce();
-    this.applySpin();
-    this.applyVelocity();
-    this.applyPerspective();
-
-    this.stage.update();
-  }
 
   hitBall(e) {
     const humanPaddle = this.stage.getChildByName('humanPaddle');
-
-    if (this.ball.x - 35 <= humanPaddle.x + 120
-        && this.ball.x + 35 >= humanPaddle.x
-        && this.ball.y - 35 <= humanPaddle.y + 60
-        && this.ball.y + 35 >= humanPaddle.y) {
+    if (this.ball.shape.x - 35 <= humanPaddle.x + 120
+        && this.ball.shape.x + 35 >= humanPaddle.x
+        && this.ball.shape.y - 35 <= humanPaddle.y + 60
+        && this.ball.shape.y + 35 >= humanPaddle.y) {
       e.remove();
       this.nearHit.load();
       this.nearHit.play();
@@ -373,8 +307,15 @@ class Corridor {
       if (this.ball.ySpin < -15) {
         this.ball.ySpin = -15;
       }
-      this.ticker.addEventListener('tick', this.moveBall.bind(this));
+      this.ticker.addEventListener('tick', this.doTheStuff.bind(this));
     }
+  }
+
+  doTheStuff() {
+    this.ball.move();
+    this.detectWallBounce();
+    this.detectGoalOrHit();
+    this.updateBallMarker();
   }
 
 
