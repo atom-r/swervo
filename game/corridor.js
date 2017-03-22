@@ -187,7 +187,7 @@ class Corridor {
   detectHumanHit() {
     if (this.ball.shape.x - (this.ball.radius) <= this.humanPaddle.shape.x + 120
         && this.ball.shape.x + (this.ball.radius) >= this.humanPaddle.shape.x
-        && this.ball.shape.y - (this.ball.radius) <= this.humanPaddle.shape.y + 60
+        && this.ball.shape.y - (this.ball.radius) <= this.humanPaddle.shape.y + 80
         && this.ball.shape.y + (this.ball.radius) >= this.humanPaddle.shape.y) {
       this.nearHit.load();
       this.nearHit.play();
@@ -210,10 +210,10 @@ class Corridor {
 
   detectCpuHit() {
     const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-    if (this.ball.shape.x - 400 - (this.ball.radius) <= this.cpuPaddle.shape.x + 15
-        && this.ball.shape.x - 400 + (this.ball.radius) >= this.cpuPaddle.shape.x - 15
-        && this.ball.shape.y - 300 - (this.ball.radius) <= this.cpuPaddle.shape.y + 10
-        && this.ball.shape.y - 300 + (this.ball.radius) >= this.cpuPaddle.shape.y - 10) {
+    if (this.ball.shape.x - this.ball.radius <= this.cpuPaddle.shape.x + 30
+        && this.ball.shape.x + this.ball.radius >= this.cpuPaddle.shape.x
+        && this.ball.shape.y - this.ball.radius <= this.cpuPaddle.shape.y + 20
+        && this.ball.shape.y + this.ball.radius >= this.cpuPaddle.shape.y) {
       this.farHit.load();
       this.farHit.play();
     } else {
