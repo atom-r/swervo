@@ -1,5 +1,3 @@
-
-
 class Paddle {
 
   constructor(width, height, color, type, stage) {
@@ -27,8 +25,8 @@ class Paddle {
       .beginFill(this.color)
       .drawRoundRect(0, 0, this.width, this.height, 10);
     this.shape.alpha = 0.5;
-    this.shape.prevX = 0;
-    this.shape.prevY = 0;
+    this.prevX = 0;
+    this.prevY = 0;
 
     this.stage.addChild(this.shape);
   }
@@ -40,10 +38,17 @@ class Paddle {
       .beginFill(this.color)
       .drawRoundRect(385, 290, this.width, this.height, 3);
     this.shape.alpha = 0.5;
-    this.shape.rawX = 0;
-    this.shape.rawY = 0;
+    this.rawX = 0;
+    this.rawY = 0;
 
     this.stage.addChild(this.shape);
+  }
+
+  spinVector() {
+    const xSpin = this.shape.x - this.prevX;
+    const ySpin = this.shape.y - this.prevY;
+
+    return [xSpin, ySpin];
   }
 
 }

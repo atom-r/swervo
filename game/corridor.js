@@ -190,10 +190,10 @@ class Corridor {
   }
 
   detectHumanHit() {
-    if (this.ball.shape.x - (this.ball.radius) <= this.humanPaddle.x + 120
-        && this.ball.shape.x + (this.ball.radius) >= this.humanPaddle.x
-        && this.ball.shape.y - (this.ball.radius) <= this.humanPaddle.y + 60
-        && this.ball.shape.y + (this.ball.radius) >= this.humanPaddle.y) {
+    if (this.ball.shape.x - (this.ball.radius) <= this.humanPaddle.shape.x + 120
+        && this.ball.shape.x + (this.ball.radius) >= this.humanPaddle.shape.x
+        && this.ball.shape.y - (this.ball.radius) <= this.humanPaddle.shape.y + 60
+        && this.ball.shape.y + (this.ball.radius) >= this.humanPaddle.shape.y) {
       this.nearHit.load();
       this.nearHit.play();
       this.getSpin();
@@ -208,19 +208,17 @@ class Corridor {
   }
 
   getSpin() {
-    const humanPaddle = this.stage.getChildByName('humanPaddle');
-    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-
-    this.ball.xSpin += humanPaddle.x - humanPaddle.prevX;
-    this.ball.ySpin += humanPaddle.y - humanPaddle.prevY;
+    let [xSpin, ySpin] = this.humanPaddle.spinVector();
+    this.ball.xSpin += xSpin;
+    this.ball.ySpin += ySpin;
   }
 
   detectCpuHit() {
     const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-    if (this.ball.shape.x - 400 - (this.ball.radius) <= this.cpuPaddle.x + 15
-        && this.ball.shape.x - 400 + (this.ball.radius) >= this.cpuPaddle.x - 15
-        && this.ball.shape.y - 300 - (this.ball.radius) <= this.cpuPaddle.y + 10
-        && this.ball.shape.y - 300 + (this.ball.radius) >= this.cpuPaddle.y - 10) {
+    if (this.ball.shape.x - 400 - (this.ball.radius) <= this.cpuPaddle.shape.x + 15
+        && this.ball.shape.x - 400 + (this.ball.radius) >= this.cpuPaddle.shape.x - 15
+        && this.ball.shape.y - 300 - (this.ball.radius) <= this.cpuPaddle.shape.y + 10
+        && this.ball.shape.y - 300 + (this.ball.radius) >= this.cpuPaddle.shape.y - 10) {
       this.farHit.load();
       this.farHit.play();
     } else {

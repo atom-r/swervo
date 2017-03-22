@@ -428,10 +428,10 @@
 	  }
 
 	  detectHumanHit() {
-	    if (this.ball.shape.x - (this.ball.radius) <= this.humanPaddle.x + 120
-	        && this.ball.shape.x + (this.ball.radius) >= this.humanPaddle.x
-	        && this.ball.shape.y - (this.ball.radius) <= this.humanPaddle.y + 60
-	        && this.ball.shape.y + (this.ball.radius) >= this.humanPaddle.y) {
+	    if (this.ball.shape.x - (this.ball.radius) <= this.humanPaddle.shape.x + 120
+	        && this.ball.shape.x + (this.ball.radius) >= this.humanPaddle.shape.x
+	        && this.ball.shape.y - (this.ball.radius) <= this.humanPaddle.shape.y + 60
+	        && this.ball.shape.y + (this.ball.radius) >= this.humanPaddle.shape.y) {
 	      this.nearHit.load();
 	      this.nearHit.play();
 	      this.getSpin();
@@ -446,19 +446,17 @@
 	  }
 
 	  getSpin() {
-	    const humanPaddle = this.stage.getChildByName('humanPaddle');
-	    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-
-	    this.ball.xSpin += humanPaddle.x - humanPaddle.prevX;
-	    this.ball.ySpin += humanPaddle.y - humanPaddle.prevY;
+	    let [xSpin, ySpin] = this.humanPaddle.spinVector();
+	    this.ball.xSpin += xSpin;
+	    this.ball.ySpin += ySpin;
 	  }
 
 	  detectCpuHit() {
 	    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-	    if (this.ball.shape.x - 400 - (this.ball.radius) <= this.cpuPaddle.x + 15
-	        && this.ball.shape.x - 400 + (this.ball.radius) >= this.cpuPaddle.x - 15
-	        && this.ball.shape.y - 300 - (this.ball.radius) <= this.cpuPaddle.y + 10
-	        && this.ball.shape.y - 300 + (this.ball.radius) >= this.cpuPaddle.y - 10) {
+	    if (this.ball.shape.x - 400 - (this.ball.radius) <= this.cpuPaddle.shape.x + 15
+	        && this.ball.shape.x - 400 + (this.ball.radius) >= this.cpuPaddle.shape.x - 15
+	        && this.ball.shape.y - 300 - (this.ball.radius) <= this.cpuPaddle.shape.y + 10
+	        && this.ball.shape.y - 300 + (this.ball.radius) >= this.cpuPaddle.shape.y - 10) {
 	      this.farHit.load();
 	      this.farHit.play();
 	    } else {
@@ -646,8 +644,6 @@
 /* 3 */
 /***/ function(module, exports) {
 
-	
-
 	class Paddle {
 
 	  constructor(width, height, color, type, stage) {
@@ -675,8 +671,8 @@
 	      .beginFill(this.color)
 	      .drawRoundRect(0, 0, this.width, this.height, 10);
 	    this.shape.alpha = 0.5;
-	    this.shape.prevX = 0;
-	    this.shape.prevY = 0;
+	    this.prevX = 0;
+	    this.prevY = 0;
 
 	    this.stage.addChild(this.shape);
 	  }
@@ -688,10 +684,17 @@
 	      .beginFill(this.color)
 	      .drawRoundRect(385, 290, this.width, this.height, 3);
 	    this.shape.alpha = 0.5;
-	    this.shape.rawX = 0;
-	    this.shape.rawY = 0;
+	    this.rawX = 0;
+	    this.rawY = 0;
 
 	    this.stage.addChild(this.shape);
+	  }
+
+	  spinVector() {
+	    const xSpin = this.shape.x - this.prevX;
+	    const ySpin = this.shape.y - this.prevY;
+
+	    return [xSpin, ySpin];
 	  }
 
 	}
