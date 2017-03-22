@@ -613,33 +613,24 @@
 	  }
 
 	  draw() {
+	    let borderRadius;
+	    let strokeStyle;
 	    if (this.type === 'near') {
-	      this.drawNearPaddle();
+	      borderRadius = 10;
+	      strokeStyle = 4;
 	    } else {
-	      this.drawFarPaddle();
+	      borderRadius = 3;
+	      strokeStyle = 2;
 	    }
-	  }
 
-	  drawNearPaddle() {
 	    this.shape.graphics
 	      .beginStroke(this.color)
-	      .setStrokeStyle(4)
+	      .setStrokeStyle(strokeStyle)
 	      .beginFill(this.color)
-	      .drawRoundRect(0, 0, this.width, this.height, 10);
+	      .drawRoundRect(0, 0, this.width, this.height, borderRadius);
 	    this.shape.alpha = 0.5;
-	    this.prevX = 0;
-	    this.prevY = 0;
-
-	    this.stage.addChild(this.shape);
-	  }
-
-	  drawFarPaddle() {
-	    this.shape.graphics
-	      .beginStroke(this.color)
-	      .setStrokeStyle(2)
-	      .beginFill(this.color)
-	      .drawRoundRect(0, 0, this.width, this.height, 3);
-	    this.shape.alpha = 0.5;
+	    this.prevX = 400;
+	    this.prevY = 300;
 	    this.shape.x = 400;
 	    this.shape.y = 300;
 
