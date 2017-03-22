@@ -237,16 +237,23 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	const Ball = __webpack_require__(2)
+	const Paddle = __webpack_require__(3)
 
 	CENTER_X = 400;
 	CENTER_Y = 300;
+
+	HUMAN_COLOR = "#2176FF";
+	CPU_COLOR = "#F26430";
 
 	class Corridor {
 
 	  constructor(stage, swervo) {
 	    this.stage = stage;
 	    this.swervo = swervo;
+
 	    this.ball = new Ball(this.stage, 60);
+	    this.humanPaddle = new Paddle(120, 80, HUMAN_COLOR, "near", this.stage)
+	    this.cpuPaddle = new Paddle(30, 20, CPU_COLOR, "far", this.stage)
 
 	    this.max_distance = 60;
 	    this.cpuTrackingRatio = 30;
@@ -309,38 +316,6 @@
 	    this.stage.addChild(shape);
 	  }
 
-	  buildHumanPaddle() {
-	    const humanPaddle = new createjs.Shape();
-	    humanPaddle.graphics
-	      .beginStroke("#2176FF")
-	      .setStrokeStyle(4)
-	      .beginFill("#2176FF")
-	      .drawRoundRect(0, 0, 120, 80, 10);
-	    humanPaddle.alpha = 0.5;
-	    humanPaddle.name = 'humanPaddle';
-	    humanPaddle.prevX = 0;
-	    humanPaddle.prevY = 0;
-
-	    this.stage.addChild(humanPaddle);
-	  }
-
-	  buildCpuPaddle() {
-	    const cpuPaddle = new createjs.Shape();
-	    cpuPaddle.graphics
-	      .beginStroke("#F26430")
-	      .setStrokeStyle(2)
-	      .beginFill("#F26430")
-	      .drawRoundRect(385, 290, 30, 20, 3);
-	    cpuPaddle.alpha = 0.5;
-	    cpuPaddle.name = 'cpuPaddle';
-	    cpuPaddle.rawX = 0;
-	    cpuPaddle.rawY = 0;
-	    cpuPaddle.prevRawX = 0;
-	    cpuPaddle.prevRawY = 0;
-
-	    this.stage.addChild(cpuPaddle);
-	  }
-
 	  drawBallMarker() {
 	    const ballMarker = new createjs.Shape();
 
@@ -354,56 +329,54 @@
 	  };
 
 	  moveHumanPaddle() {
-	    const humanPaddle = this.stage.getChildByName('humanPaddle');
 	    let difX;
 	    let difY;
 
 	    if (this.stage.mouseX < 652 && this.stage.mouseX > 148){
-	      difX = this.stage.mouseX - humanPaddle.x - 60;
+	      difX = this.stage.mouseX - this.humanPaddle.shape.x - 60;
 	    } else if (this.stage.mouseX <= 148){
-	      difX = 148 - humanPaddle.x - 60;
+	      difX = 148 - this.humanPaddle.shape.x - 60;
 	    } else {
-	      difX = 652 - humanPaddle.x - 60;
+	      difX = 652 - this.humanPaddle.shape.x - 60;
 	    }
 
 	    if (this.stage.mouseY < 469 && this.stage.mouseY > 131){
-	      difY = this.stage.mouseY - humanPaddle.y - 40;
+	      difY = this.stage.mouseY - this.humanPaddle.shape.y - 40;
 	    } else if (this.stage.mouseY <= 131){
-	      difY = 131 - humanPaddle.y - 40;
+	      difY = 131 - this.humanPaddle.shape.y - 40;
 	    } else {
-	      difY = 469 - humanPaddle.y - 40;
+	      difY = 469 - this.humanPaddle.shape.y - 40;
 	    }
 
-	    humanPaddle.prevX = humanPaddle.x;
-	    humanPaddle.prevY = humanPaddle.y;
-	    humanPaddle.x += difX/1.2;
-	    humanPaddle.y += difY/1.2;
+	    this.humanPaddle.prevX = this.humanPaddle.shape.x;
+	    this.humanPaddle.prevY = this.humanPaddle.shape.y;
+	    this.humanPaddle.shape.x += difX/1.2;
+	    this.humanPaddle.shape.y += difY/1.2;
 	  }
 
 	  moveCpuPaddle() {
-	    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-	    const cpuDifX = this.ball.rawX - 400 - cpuPaddle.rawX;
-	    const cpuDifY = this.ball.rawY - 300 - cpuPaddle.rawY;
+	    const cpuDifX = this.ball.rawX - 400 - this.cpuPaddle.rawX;
+	    const cpuDifY = this.ball.rawY - 300 - this.cpuPaddle.rawY;
 
-	    cpuPaddle.prevX = cpuPaddle.rawX;
-	    cpuPaddle.prevY = cpuPaddle.rawY;
-	    cpuPaddle.rawX += cpuDifX / (5 + this.cpuTrackingRatio);
-	    cpuPaddle.rawY += cpuDifY / (5 + this.cpuTrackingRatio);
+	    this.cpuPaddle.prevX = this.cpuPaddle.rawX;
+	    this.cpuPaddle.prevY = this.cpuPaddle.rawY;
+	    this.cpuPaddle.rawX += cpuDifX / (5 + this.cpuTrackingRatio);
+	    this.cpuPaddle.rawY += cpuDifY / (5 + this.cpuTrackingRatio);
 
-	    if (cpuPaddle.rawX > 249){
-	      cpuPaddle.rawX = 249;
-	    } else if (cpuPaddle.rawX < -241) {
-	      cpuPaddle.rawX = -241;
+	    if (this.cpuPaddle.rawX > 249){
+	      this.cpuPaddle.rawX = 249;
+	    } else if (this.cpuPaddle.rawX < -241) {
+	      this.cpuPaddle.rawX = -241;
 	    }
 
-	    if (cpuPaddle.rawY > 161){
-	      cpuPaddle.rawY = 161;
-	    } else if (cpuPaddle.rawY < -161) {
-	      cpuPaddle.rawY = -161;
+	    if (this.cpuPaddle.rawY > 161){
+	      this.cpuPaddle.rawY = 161;
+	    } else if (this.cpuPaddle.rawY < -161) {
+	      this.cpuPaddle.rawY = -161;
 	    }
 
-	    cpuPaddle.x = cpuPaddle.rawX * 79/312;
-	    cpuPaddle.y = cpuPaddle.rawY * 53/209;
+	    this.cpuPaddle.shape.x = this.cpuPaddle.rawX * 79/312;
+	    this.cpuPaddle.shape.y = this.cpuPaddle.rawY * 53/209;
 	  }
 
 	  movePaddles() {
@@ -413,11 +386,10 @@
 	  }
 
 	  renderPieces() {
-	    this.buildCpuPaddle();
+	    this.cpuPaddle.draw();
 	    this.ball.draw();
-	    this.buildHumanPaddle();
+	    this.humanPaddle.draw();
 	    this.drawBallMarker();
-
 	    this.ticker.addEventListener('tick', this.movePaddles.bind(this));
 	  }
 
@@ -456,11 +428,10 @@
 	  }
 
 	  detectHumanHit() {
-	    const humanPaddle = this.stage.getChildByName('humanPaddle');
-	    if (this.ball.shape.x - (this.ball.radius) <= humanPaddle.x + 120
-	        && this.ball.shape.x + (this.ball.radius) >= humanPaddle.x
-	        && this.ball.shape.y - (this.ball.radius) <= humanPaddle.y + 60
-	        && this.ball.shape.y + (this.ball.radius) >= humanPaddle.y) {
+	    if (this.ball.shape.x - (this.ball.radius) <= this.humanPaddle.x + 120
+	        && this.ball.shape.x + (this.ball.radius) >= this.humanPaddle.x
+	        && this.ball.shape.y - (this.ball.radius) <= this.humanPaddle.y + 60
+	        && this.ball.shape.y + (this.ball.radius) >= this.humanPaddle.y) {
 	      this.nearHit.load();
 	      this.nearHit.play();
 	      this.getSpin();
@@ -484,10 +455,10 @@
 
 	  detectCpuHit() {
 	    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-	    if (this.ball.shape.x - 400 - (this.ball.radius) <= cpuPaddle.x + 15
-	        && this.ball.shape.x - 400 + (this.ball.radius) >= cpuPaddle.x - 15
-	        && this.ball.shape.y - 300 - (this.ball.radius) <= cpuPaddle.y + 10
-	        && this.ball.shape.y - 300 + (this.ball.radius) >= cpuPaddle.y - 10) {
+	    if (this.ball.shape.x - 400 - (this.ball.radius) <= this.cpuPaddle.x + 15
+	        && this.ball.shape.x - 400 + (this.ball.radius) >= this.cpuPaddle.x - 15
+	        && this.ball.shape.y - 300 - (this.ball.radius) <= this.cpuPaddle.y + 10
+	        && this.ball.shape.y - 300 + (this.ball.radius) >= this.cpuPaddle.y - 10) {
 	      this.farHit.load();
 	      this.farHit.play();
 	    } else {
@@ -513,11 +484,10 @@
 
 
 	  hitBall(e) {
-	    const humanPaddle = this.stage.getChildByName('humanPaddle');
-	    if (this.ball.shape.x - 35 <= humanPaddle.x + 120
-	        && this.ball.shape.x + 35 >= humanPaddle.x
-	        && this.ball.shape.y - 35 <= humanPaddle.y + 60
-	        && this.ball.shape.y + 35 >= humanPaddle.y) {
+	    if (this.ball.shape.x - 35 <= this.humanPaddle.shape.x + 120
+	        && this.ball.shape.x + 35 >= this.humanPaddle.shape.x
+	        && this.ball.shape.y - 35 <= this.humanPaddle.shape.y + 60
+	        && this.ball.shape.y + 35 >= this.humanPaddle.shape.y) {
 	      e.remove();
 	      this.nearHit.load();
 	      this.nearHit.play();
@@ -670,6 +640,63 @@
 	}
 
 	module.exports = Ball;
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	
+
+	class Paddle {
+
+	  constructor(width, height, color, type, stage) {
+	    this.width = width;
+	    this.height = height;
+	    this.color = color;
+	    this.type = type;
+	    this.stage = stage;
+
+	    this.shape = new createjs.Shape();
+	  }
+
+	  draw() {
+	    if (this.type === 'near') {
+	      this.drawNearPaddle();
+	    } else {
+	      this.drawFarPaddle();
+	    }
+	  }
+
+	  drawNearPaddle() {
+	    this.shape.graphics
+	      .beginStroke(this.color)
+	      .setStrokeStyle(4)
+	      .beginFill(this.color)
+	      .drawRoundRect(0, 0, this.width, this.height, 10);
+	    this.shape.alpha = 0.5;
+	    this.shape.prevX = 0;
+	    this.shape.prevY = 0;
+
+	    this.stage.addChild(this.shape);
+	  }
+
+	  drawFarPaddle() {
+	    this.shape.graphics
+	      .beginStroke(this.color)
+	      .setStrokeStyle(2)
+	      .beginFill(this.color)
+	      .drawRoundRect(385, 290, this.width, this.height, 3);
+	    this.shape.alpha = 0.5;
+	    this.shape.rawX = 0;
+	    this.shape.rawY = 0;
+
+	    this.stage.addChild(this.shape);
+	  }
+
+	}
+
+	module.exports = Paddle;
 
 
 /***/ }
