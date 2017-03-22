@@ -11,10 +11,10 @@ class Paddle {
   }
 
   hit(ball) {
-    if (ball.shape.x - (ball.radius) <= this.shape.x + this.width
-        && ball.shape.x + (ball.radius) >= this.shape.x
-        && ball.shape.y - (ball.radius) <= this.shape.y + this.height
-        && ball.shape.y + (ball.radius) >= this.shape.y) {
+    if (ball.shape.x - ball.radius <= this.shape.x + this.width
+        && ball.shape.x + ball.radius >= this.shape.x
+        && ball.shape.y - ball.radius <= this.shape.y + this.height
+        && ball.shape.y + ball.radius >= this.shape.y) {
       return true;
     } else {
       return false;
@@ -50,10 +50,8 @@ class Paddle {
       .drawRoundRect(0, 0, this.width, this.height, 3);
     this.shape.alpha = 0.5;
     this.shape.x = 400;
-    this.shape.y = 300
-    this.rawX = 400;
-    this.rawY = 300;
-    
+    this.shape.y = 300;
+
     this.stage.addChild(this.shape);
   }
 

@@ -117,20 +117,23 @@ class Corridor {
   }
 
   moveCpuPaddle() {
-    const cpuDifX = this.ball.farX - this.cpuPaddle.shape.x;
-    const cpuDifY = this.ball.farY - this.cpuPaddle.shape.y;
+    const cpuDifX = this.ball.farX - this.cpuPaddle.shape.x - 15;
+    const cpuDifY = this.ball.farY - this.cpuPaddle.shape.y - 10;
+
+    window.cpuPaddle = this.cpuPaddle;
+    window.ball = this.ball;
 
     this.cpuPaddle.shape.x += cpuDifX / (5 + this.cpuTrackingRatio);
     this.cpuPaddle.shape.y += cpuDifY / (5 + this.cpuTrackingRatio);
 
-    if (this.cpuPaddle.shape.x > 479){
-      this.cpuPaddle.shape.x = 479;
+    if (this.cpuPaddle.shape.x + 30 > 479){
+      this.cpuPaddle.shape.x = 479 - 30;
     } else if (this.cpuPaddle.shape.x < 321) {
       this.cpuPaddle.shape.x = 321;
     }
 
-    if (this.cpuPaddle.shape.y > 353){
-      this.cpuPaddle.shape.y = 353;
+    if (this.cpuPaddle.shape.y + 20 > 353){
+      this.cpuPaddle.shape.y = 353 - 20;
     } else if (this.cpuPaddle.shape.y < 247) {
       this.cpuPaddle.shape.y = 247;
     }
@@ -185,10 +188,7 @@ class Corridor {
   }
 
   detectHumanHit() {
-    if (this.ball.shape.x - (this.ball.radius) <= this.humanPaddle.shape.x + 120
-        && this.ball.shape.x + (this.ball.radius) >= this.humanPaddle.shape.x
-        && this.ball.shape.y - (this.ball.radius) <= this.humanPaddle.shape.y + 80
-        && this.ball.shape.y + (this.ball.radius) >= this.humanPaddle.shape.y) {
+    if (this.humanPaddle.hit(this.ball)) {
       this.nearHit.load();
       this.nearHit.play();
       this.getSpin();
@@ -210,10 +210,7 @@ class Corridor {
 
   detectCpuHit() {
     const cpuPaddle = this.stage.getChildByName('cpuPaddle');
-    if (this.ball.shape.x - this.ball.radius <= this.cpuPaddle.shape.x + 30
-        && this.ball.shape.x + this.ball.radius >= this.cpuPaddle.shape.x
-        && this.ball.shape.y - this.ball.radius <= this.cpuPaddle.shape.y + 20
-        && this.ball.shape.y + this.ball.radius >= this.cpuPaddle.shape.y) {
+    if (this.cpuPaddle.hit(this.ball)) {
       this.farHit.load();
       this.farHit.play();
     } else {
