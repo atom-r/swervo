@@ -117,28 +117,23 @@ class Corridor {
   }
 
   moveCpuPaddle() {
-    const cpuDifX = this.ball.rawX - 400 - this.cpuPaddle.rawX;
-    const cpuDifY = this.ball.rawY - 300 - this.cpuPaddle.rawY;
+    const cpuDifX = this.ball.farX - this.cpuPaddle.shape.x;
+    const cpuDifY = this.ball.farY - this.cpuPaddle.shape.y;
 
-    this.cpuPaddle.prevX = this.cpuPaddle.rawX;
-    this.cpuPaddle.prevY = this.cpuPaddle.rawY;
-    this.cpuPaddle.rawX += cpuDifX / (5 + this.cpuTrackingRatio);
-    this.cpuPaddle.rawY += cpuDifY / (5 + this.cpuTrackingRatio);
+    this.cpuPaddle.shape.x += cpuDifX / (5 + this.cpuTrackingRatio);
+    this.cpuPaddle.shape.y += cpuDifY / (5 + this.cpuTrackingRatio);
 
-    if (this.cpuPaddle.rawX > 249){
-      this.cpuPaddle.rawX = 249;
-    } else if (this.cpuPaddle.rawX < -241) {
-      this.cpuPaddle.rawX = -241;
+    if (this.cpuPaddle.shape.x > 479){
+      this.cpuPaddle.shape.x = 479;
+    } else if (this.cpuPaddle.shape.x < 321) {
+      this.cpuPaddle.shape.x = 321;
     }
 
-    if (this.cpuPaddle.rawY > 161){
-      this.cpuPaddle.rawY = 161;
-    } else if (this.cpuPaddle.rawY < -161) {
-      this.cpuPaddle.rawY = -161;
+    if (this.cpuPaddle.shape.y > 353){
+      this.cpuPaddle.shape.y = 353;
+    } else if (this.cpuPaddle.shape.y < 247) {
+      this.cpuPaddle.shape.y = 247;
     }
-
-    this.cpuPaddle.shape.x = this.cpuPaddle.rawX * 79/312;
-    this.cpuPaddle.shape.y = this.cpuPaddle.rawY * 53/209;
   }
 
   movePaddles() {

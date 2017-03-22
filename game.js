@@ -355,28 +355,23 @@
 	  }
 
 	  moveCpuPaddle() {
-	    const cpuDifX = this.ball.rawX - 400 - this.cpuPaddle.rawX;
-	    const cpuDifY = this.ball.rawY - 300 - this.cpuPaddle.rawY;
+	    const cpuDifX = this.ball.farX - this.cpuPaddle.shape.x;
+	    const cpuDifY = this.ball.farY - this.cpuPaddle.shape.y;
 
-	    this.cpuPaddle.prevX = this.cpuPaddle.rawX;
-	    this.cpuPaddle.prevY = this.cpuPaddle.rawY;
-	    this.cpuPaddle.rawX += cpuDifX / (5 + this.cpuTrackingRatio);
-	    this.cpuPaddle.rawY += cpuDifY / (5 + this.cpuTrackingRatio);
+	    this.cpuPaddle.shape.x += cpuDifX / (5 + this.cpuTrackingRatio);
+	    this.cpuPaddle.shape.y += cpuDifY / (5 + this.cpuTrackingRatio);
 
-	    if (this.cpuPaddle.rawX > 249){
-	      this.cpuPaddle.rawX = 249;
-	    } else if (this.cpuPaddle.rawX < -241) {
-	      this.cpuPaddle.rawX = -241;
+	    if (this.cpuPaddle.shape.x > 479){
+	      this.cpuPaddle.shape.x = 479;
+	    } else if (this.cpuPaddle.shape.x < 321) {
+	      this.cpuPaddle.shape.x = 321;
 	    }
 
-	    if (this.cpuPaddle.rawY > 161){
-	      this.cpuPaddle.rawY = 161;
-	    } else if (this.cpuPaddle.rawY < -161) {
-	      this.cpuPaddle.rawY = -161;
+	    if (this.cpuPaddle.shape.y > 353){
+	      this.cpuPaddle.shape.y = 353;
+	    } else if (this.cpuPaddle.shape.y < 247) {
+	      this.cpuPaddle.shape.y = 247;
 	    }
-
-	    this.cpuPaddle.shape.x = this.cpuPaddle.rawX * 79/312;
-	    this.cpuPaddle.shape.y = this.cpuPaddle.rawY * 53/209;
 	  }
 
 	  movePaddles() {
@@ -613,6 +608,9 @@
 	    this.rawX = 400;
 	    this.rawY = 300;
 
+	    this.farX = 400;
+	    this.farY = 300;
+
 	    this.shape.scaleX = 1;
 	    this.shape.scaleY = 1;
 
@@ -656,6 +654,17 @@
 	    this.shape = new createjs.Shape();
 	  }
 
+	  hit(ball) {
+	    if (ball.shape.x - (ball.radius) <= this.shape.x + this.width
+	        && ball.shape.x + (ball.radius) >= this.shape.x
+	        && ball.shape.y - (ball.radius) <= this.shape.y + this.height
+	        && ball.shape.y + (ball.radius) >= this.shape.y) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+	  }
+
 	  draw() {
 	    if (this.type === 'near') {
 	      this.drawNearPaddle();
@@ -682,11 +691,13 @@
 	      .beginStroke(this.color)
 	      .setStrokeStyle(2)
 	      .beginFill(this.color)
-	      .drawRoundRect(385, 290, this.width, this.height, 3);
+	      .drawRoundRect(0, 0, this.width, this.height, 3);
 	    this.shape.alpha = 0.5;
-	    this.rawX = 0;
-	    this.rawY = 0;
-
+	    this.shape.x = 400;
+	    this.shape.y = 300
+	    this.rawX = 400;
+	    this.rawY = 300;
+	    
 	    this.stage.addChild(this.shape);
 	  }
 

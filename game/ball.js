@@ -88,6 +88,9 @@ class Ball {
     this.rawX = 400;
     this.rawY = 300;
 
+    this.farX = 400;
+    this.farY = 300;
+
     this.shape.scaleX = 1;
     this.shape.scaleY = 1;
 
