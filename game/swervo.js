@@ -136,22 +136,21 @@ class Swervo {
   }
 
   setStage() {
-    const ball = this.stage.getChildByName('ball');
     const ballMarker = this.stage.getChildByName('ballMarker');
 
     this.corridor.ballFillCommand.style = this.corridor.ballGradient;
-    ball.x = 400;
-    ball.y = 300;
-    ball.rawX = ball.x;
-    ball.rawY = ball.y;
-    ball.xVelocity = 0;
-    ball.yVelocity = 0;
-    ball.direction = "out";
-    ball.distance = 0;
-    ball.scaleX = 1;
-    ball.scaleY = 1;
-    ball.xSpin = 5;
-    ball.ySpin = 0;
+    this.corridor.ball.x = 400;
+    this.corridor.ball.y = 300;
+    this.corridor.ball.rawX = this.corridor.ball.x;
+    this.corridor.ball.rawY = this.corridor.ball.y;
+    this.corridor.ball.xVelocity = 0;
+    this.corridor.ball.yVelocity = 0;
+    this.corridor.ball.direction = "out";
+    this.corridor.ball.distance = 0;
+    this.corridor.ball.scaleX = 1;
+    this.corridor.ball.scaleY = 1;
+    this.corridor.ball.xSpin = 5;
+    this.corridor.ball.ySpin = 0;
     ballMarker.graphics.clear().beginStroke("#009B72").drawRect(88, 91, 624, 418);
     this.stage.on('stagemousedown', this.corridor.hitBall.bind(this.corridor));
   }
