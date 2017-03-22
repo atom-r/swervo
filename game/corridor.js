@@ -103,17 +103,6 @@ class Corridor {
     this.stage.addChild(cpuPaddle);
   }
 
-  // buildBall() {
-  //   this.ball = new createjs.Shape();
-  //   this.ballFillCommand = this.ball
-  //     .graphics
-  //     .beginRadialGradientFill(["#EEE","#444"], [0, 1], 15, -15, 0, 0, 0, 35).command;
-  //   this.ballGradient = this.ballFillCommand.style;
-  //   this.ball.graphics.drawCircle(0, 0, 35);
-  //
-  //   this.stage.addChild(this.ball);
-  // }
-
   drawBallMarker() {
     const ballMarker = new createjs.Shape();
 

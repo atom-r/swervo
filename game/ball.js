@@ -90,6 +90,10 @@ class Ball {
 
     this.shape.scaleX = 1;
     this.shape.scaleY = 1;
+
+    if (this.fillCommand) {
+      this.fillCommand.style = this.silverGradient;
+    }
   }
 
   scaleBall() {
