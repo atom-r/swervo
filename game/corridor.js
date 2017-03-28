@@ -46,18 +46,6 @@ class Corridor {
     }
   }
 
-  
-
-  drawCorner(shape, { mtx, mty, ltx, lty }) {
-    shape.graphics.beginStroke("#FFF8F0");
-    shape.graphics.setStrokeStyle(1);
-    shape.snapToPixel = true;
-    shape.graphics.moveTo(mtx, mty);
-    shape.graphics.lineTo(ltx, lty);
-
-    this.stage.addChild(shape);
-  }
-
   drawBallMarker() {
     const ballMarker = new createjs.Shape();
 
@@ -69,20 +57,6 @@ class Corridor {
 
     this.stage.addChild(ballMarker);
   };
-
-  movePaddles() {
-    this.humanPaddle.move();
-    this.cpuPaddle.move(this.ball, this.cpuTrackingRatio);
-    this.stage.update();
-  }
-
-  renderPieces() {
-    this.cpuPaddle.draw();
-    this.ball.draw();
-    this.humanPaddle.draw();
-    this.drawBallMarker();
-    this.ticker.addEventListener('tick', this.movePaddles.bind(this));
-  }
 
 
 

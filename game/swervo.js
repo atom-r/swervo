@@ -1,5 +1,6 @@
 const Corridor = require('./corridor.js')
 const Ball = require('./ball.js')
+const Paddle = require('./paddle.js')
 
 // CORRIDOR ATTRIBUTES
 WIDTH = 700;
@@ -18,6 +19,11 @@ FAR_WIDTH = WIDTH / NARROWNESS_FACTOR;
 FAR_X = (800 - FAR_WIDTH) / 2;
 FAR_Y = (600 - FAR_HEIGHT) / 2;
 
+// PADDLE ATTRIBUTES
+PADDLE_WIDTH = 120;
+PADDLE_HEIGHT = 80;
+BLUE = "#2176FF";
+
 class Swervo {
 
   constructor() {
@@ -26,6 +32,16 @@ class Swervo {
 
     this.corridor = new Corridor(WIDTH, HEIGHT, DEPTH);
     this.renderCorridor();
+
+    this.bluePaddle = new Paddle(this.stage, this.corridor, BLUE, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+    this.ticker = createjs.Ticker();
+    this.ticker.setFPS(60);
+    this.ticker.addEventListener('tick', this.handleTick.bind(this))
+  }
+
+  handleTick() {
+    this.bluePaddle.getPos();
   }
 
   renderCorridor() {

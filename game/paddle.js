@@ -1,13 +1,21 @@
 class Paddle {
 
-  constructor(width, height, color, type, stage) {
-    this.width = width;
-    this.height = height;
+  constructor(stage, corridor, color, w, h) {
+    this.width = w;
+    this.height = h;
     this.color = color;
-    this.type = type;
+    this.corridor = corridor;
     this.stage = stage;
 
-    this.shape = new createjs.Shape();
+    this.x = 0;
+    this.y = 0;
+  }
+
+  getPos() {
+    this.x = this.stage.mouseX;
+    this.y = this.stage.mouseY;
+
+    console.log(this.x);
   }
 
   center() {

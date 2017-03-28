@@ -46,6 +46,7 @@
 
 	const Corridor = __webpack_require__(1)
 	const Ball = __webpack_require__(2)
+	const Paddle = __webpack_require__(3)
 
 	// CORRIDOR ATTRIBUTES
 	WIDTH = 700;
@@ -64,6 +65,11 @@
 	FAR_X = (800 - FAR_WIDTH) / 2;
 	FAR_Y = (600 - FAR_HEIGHT) / 2;
 
+	// PADDLE ATTRIBUTES
+	PADDLE_WIDTH = 120;
+	PADDLE_HEIGHT = 80;
+	BLUE = "#2176FF";
+
 	class Swervo {
 
 	  constructor() {
@@ -72,6 +78,16 @@
 
 	    this.corridor = new Corridor(WIDTH, HEIGHT, DEPTH);
 	    this.renderCorridor();
+
+	    this.bluePaddle = new Paddle(this.stage, this.corridor, BLUE, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+	    this.ticker = createjs.Ticker();
+	    this.ticker.setFPS(60);
+	    this.ticker.addEventListener('tick', this.handleTick.bind(this))
+	  }
+
+	  handleTick() {
+	    this.bluePaddle.getPos();
 	  }
 
 	  renderCorridor() {
@@ -195,18 +211,6 @@
 	    }
 	  }
 
-	  
-
-	  drawCorner(shape, { mtx, mty, ltx, lty }) {
-	    shape.graphics.beginStroke("#FFF8F0");
-	    shape.graphics.setStrokeStyle(1);
-	    shape.snapToPixel = true;
-	    shape.graphics.moveTo(mtx, mty);
-	    shape.graphics.lineTo(ltx, lty);
-
-	    this.stage.addChild(shape);
-	  }
-
 	  drawBallMarker() {
 	    const ballMarker = new createjs.Shape();
 
@@ -218,20 +222,6 @@
 
 	    this.stage.addChild(ballMarker);
 	  };
-
-	  movePaddles() {
-	    this.humanPaddle.move();
-	    this.cpuPaddle.move(this.ball, this.cpuTrackingRatio);
-	    this.stage.update();
-	  }
-
-	  renderPieces() {
-	    this.cpuPaddle.draw();
-	    this.ball.draw();
-	    this.humanPaddle.draw();
-	    this.drawBallMarker();
-	    this.ticker.addEventListener('tick', this.movePaddles.bind(this));
-	  }
 
 
 
@@ -448,14 +438,22 @@
 
 	class Paddle {
 
-	  constructor(width, height, color, type, stage) {
-	    this.width = width;
-	    this.height = height;
+	  constructor(stage, corridor, color, w, h) {
+	    this.width = w;
+	    this.height = h;
 	    this.color = color;
-	    this.type = type;
+	    this.corridor = corridor;
 	    this.stage = stage;
 
-	    this.shape = new createjs.Shape();
+	    this.x = 0;
+	    this.y = 0;
+	  }
+
+	  getPos() {
+	    this.x = this.stage.mouseX;
+	    this.y = this.stage.mouseY;
+
+	    console.log(this.x);
 	  }
 
 	  center() {
