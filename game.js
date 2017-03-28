@@ -47,180 +47,59 @@
 	const Corridor = __webpack_require__(1)
 	const Ball = __webpack_require__(2)
 
+	// CORRIDOR ATTRIBUTES
+	WIDTH = 700;
+	HEIGHT = 500;
+	DEPTH = 1600;
+
+	NARROWNESS_FACTOR = DEPTH / 400;
+
+	NEAR_X = (800 - WIDTH) / 2;
+	NEAR_Y = (600 - HEIGHT) / 2;
+
+	FAR_HEIGHT = HEIGHT / NARROWNESS_FACTOR;
+	FAR_WIDTH = WIDTH / NARROWNESS_FACTOR;
+
+	FAR_X = (800 - FAR_WIDTH) / 2;
+	FAR_Y = (600 - FAR_HEIGHT) / 2;
+
 	class Swervo {
 
 	  constructor() {
 	    this.stage = this.stage || new createjs.Stage("myCanvas");
 	    this.stage.canvas.style.cursor = "none";
 
-	    this.cpuStrikes = 2;
-	    this.humanStrikes = 5;
-	    this.level = 1;
-
-	    this.corridor = new Corridor(this.stage, this);
-
-	    this.buildCpuScore();
-	    this.buildHumanScore();
-	    this.printInstructions();
-	    this.printLevel();
-	    this.setStage();
+	    this.corridor = new Corridor(WIDTH, HEIGHT, DEPTH);
+	    this.renderCorridor(9);
 	  }
 
-	  buildCpuScore() {
-	    const text = new createjs.Text("CPU", "20px Arial", "#FFF8F0");
-	    text.x = 100;
-	    text.y = 70;
-	    text.textBaseline = "alphabetic";
-
-	    this.stage.addChild(text);
-	    this.buildCpuStrikes();
-
-	    this.stage.update();
-	  }
-
-	  buildCpuStrikes() {
-	    this.cpuStrikeShapes = [];
-	    for (let i = 0; i < this.cpuStrikes; i++) {
-	      this.cpuStrikeShapes[i] = new createjs.Shape();
-	      this.cpuStrikeShapes[i].graphics.beginFill("#F26430").drawCircle((160 + i * 25), 62, 10);
-
-	      this.stage.addChild(this.cpuStrikeShapes[i]);
+	  renderCorridor(numRectangles) {
+	    let distance = 0;
+	    for (var i = 0; i <= numRectangles; i++) {
+	      this.drawRectangle(distance);
+	      distance += DEPTH / numRectangles;
 	    }
+	    this.stage.update()
 	  }
 
-	  buildHumanScore() {
-	    const text = new createjs.Text("Player", "20px Arial", "#FFF8F0");
-	    text.x = 650;
-	    text.y = 70;
-	    text.textBaseline = "alphabetic";
+	  drawRectangle(distance) {
+	    const [x, y, w, h] = this.getDimensions(distance)
+	    const rect = new createjs.Shape();
+	    rect.graphics.beginStroke("#FFF8F0");
+	    rect.graphics.setStrokeStyle(1);
+	    rect.snapToPixel = true;
+	    rect.graphics.drawRect(x, y, w, h);
 
-	    this.stage.addChild(text);
-	    this.buildHumanStrikes();
-
-	    this.stage.update();
+	    this.stage.addChild(rect);
 	  }
 
-	  buildHumanStrikes() {
-	    this.humanStrikeShapes = [];
-	    for (let i = 0; i < this.humanStrikes; i++) {
-	      this.humanStrikeShapes[i] = new createjs.Shape();
-	      this.humanStrikeShapes[i].graphics.beginFill("#2176FF").drawCircle((630 - i * 25), 62, 10);
+	  getDimensions(distance) {
+	    const x = NEAR_X - (NEAR_X - FAR_X) * Math.sqrt(distance) / Math.sqrt(DEPTH);
+	    const y = NEAR_Y - (NEAR_Y - FAR_Y) * Math.sqrt(distance) / Math.sqrt(DEPTH);
+	    const w = (800 - 2 * x);
+	    const h = (600 - 2 * y);
 
-	      this.stage.addChild(this.humanStrikeShapes[i]);
-	    }
-	  }
-
-	  printGameOver() {
-	    const frame = new createjs.Shape();
-	    frame.graphics
-	      .beginFill("#555")
-	      .drawRoundRect(275, 250, 250, 100, 5);
-
-	    const gameOver = new createjs.Text(`Game Over`, "42px Arial", "#FFF");
-	    gameOver.x = 290;
-	    gameOver.y = 315;
-	    gameOver.textBaseline = "alphabetic";
-
-	    const spaceText = new createjs.Text(`Click to restart`, "24px Arial", "#FFF8F0");
-	    spaceText.x = 320;
-	    spaceText.y = 570;
-	    spaceText.textBaseline = "alphabetic";
-
-	    this.stage.addChild(frame);
-	    this.stage.addChild(gameOver);
-	    this.stage.addChild(spaceText);
-
-	    this.stage.update();
-
-	    this.stage.on('mousedown', this.restart.bind(this));
-	  }
-
-	  printInstructions() {
-	    const text = new createjs.Text("To curve: sweep the paddle over the ball as it hits", "16px Arial", "#FFF8F0");
-	    text.x = 230;
-	    text.y = 25;
-	    text.textBaseline = "alphabetic";
-	    text.name = 'instructions';
-
-	    this.stage.addChild(text);
-	  }
-
-	  printLevel() {
-	    const text = new createjs.Text(`Level ${this.level}`, "24px Arial", "#FFF8F0");
-	    text.x = 363;
-	    text.y = 540;
-	    text.textBaseline = "alphabetic";
-	    text.name = "level";
-
-	    this.stage.addChild(text);
-
-	    this.stage.update();
-	  }
-
-	  resetPieces(loser) {
-	    if(loser === 'cpu') {
-	      this.updateCpuStrikes();
-	    } else {
-	      this.updateHumanStrikes();
-	    }
-	  }
-
-	  restart() {
-	    this.stage.removeAllEventListeners();
-	    this.corridor.ticker.removeAllEventListeners();
-	    this.stage.removeAllChildren();
-
-	    this.cpuStrikes = 2;
-	    this.humanStrikes = 5;
-	    this.level = 1;
-
-	    this.corridor = new Corridor(this.stage, this);
-
-	    this.buildCpuScore();
-	    this.buildHumanScore();
-	    this.printLevel();
-	    this.setStage();
-	  }
-
-	  setStage() {
-	    const ballMarker = this.stage.getChildByName('ballMarker');
-
-	    this.corridor.ball.reset();
-	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(88, 91, 624, 418);
-	    this.stage.on('stagemousedown', this.corridor.hitBall.bind(this.corridor));
-	  }
-
-	  updateCpuStrikes() {
-	    if(this.cpuStrikes > 0){
-	      this.cpuStrikeShapes[this.cpuStrikes - 1].graphics.clear();
-	      this.cpuStrikes -= 1;
-	    } else {
-	      const level = this.stage.getChildByName('level');
-	      this.level += 1;
-	      level.text = `Level ${this.level}`
-	      if (this.level === 2) {
-	        const instructions = this.stage.getChildByName('instructions');
-	        if (instructions) instructions.text = "";
-	      }
-	      this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.4 ;
-	      this.cpuStrikes = 2;
-	      setTimeout( () => {
-	        this.corridor.ball.maxDistance = Math.floor(this.corridor.ball.maxDistance * 0.95);
-	        this.corridor.maxDistance = this.corridor.ball.maxDistance;
-	      }, 1000);
-	      setTimeout(this.buildCpuStrikes.bind(this), 1000);
-	    }
-	    setTimeout(this.setStage.bind(this), 1000);
-	  }
-
-	  updateHumanStrikes() {
-	    if(this.humanStrikes > 0){
-	      this.humanStrikeShapes[this.humanStrikes - 1].graphics.clear();
-	      this.humanStrikes -= 1;
-	      setTimeout(this.setStage.bind(this), 1000);
-	    } else {
-	      this.printGameOver();
-	    }
+	    return [x, y, w, h];
 	  }
 	}
 
@@ -251,28 +130,10 @@
 
 	class Corridor {
 
-	  constructor(stage, swervo) {
-	    this.stage = stage;
-	    this.swervo = swervo;
-
-	    this.ball = new Ball(this.stage, 60);
-	    this.humanPaddle = new Paddle(HUMAN_PADDLE_WIDTH, HUMAN_PADDLE_HEIGHT, HUMAN_COLOR, "near", this.stage)
-	    this.cpuPaddle = new Paddle(CPU_PADDLE_WIDTH, CPU_PADDLE_HEIGHT, CPU_COLOR, "far", this.stage)
-
-	    this.maxDistance = 60;
-	    this.cpuTrackingRatio = 30;
-
-	    this.ticker = createjs.Ticker;
-	    this.ticker.setFPS(60);
-
-	    this.nearHit = new Audio('./audio/nearhit.mp3');
-	    this.farHit = new Audio('./audio/farhit.mp3');
-	    this.vWallHit = new Audio('./audio/wallhit.mp3');
-	    this.hWallHit = new Audio('./audio/wallhit0.mp3');
-	    this.goal = new Audio('./audio/goal.mp3');
-
-	    this.renderCorridor();
-	    this.renderPieces();
+	  constructor(w, h, d) {
+	    this.width = w;
+	    this.height = h;
+	    this.depth = d;
 	  }
 
 	  detectWallBounce() {
@@ -301,14 +162,7 @@
 	    }
 	  }
 
-	  drawRectangle(shape, { x, y, w, h }) {
-	    shape.graphics.beginStroke("#FFF8F0");
-	    shape.graphics.setStrokeStyle(1);
-	    shape.snapToPixel = true;
-	    shape.graphics.drawRect(x, y, w, h);
-
-	    this.stage.addChild(shape);
-	  }
+	  
 
 	  drawCorner(shape, { mtx, mty, ltx, lty }) {
 	    shape.graphics.beginStroke("#FFF8F0");
@@ -346,39 +200,7 @@
 	    this.ticker.addEventListener('tick', this.movePaddles.bind(this));
 	  }
 
-	  renderCorridor() {
-	    const border1 = new createjs.Shape();
-	    const border2 = new createjs.Shape();
-	    const border3 = new createjs.Shape();
-	    const border4 = new createjs.Shape();
-	    const border5 = new createjs.Shape();
-	    const border6 = new createjs.Shape();
-	    const border7 = new createjs.Shape();
-	    const border8 = new createjs.Shape();
-	    const border9 = new createjs.Shape();
 
-	    this.drawRectangle(border1, { x: 88, y: 91, w: 624, h: 418 });
-	    this.drawRectangle(border2, { x: 146, y: 130, w: 508, h: 340 });
-	    this.drawRectangle(border3, { x: 195, y: 162, w: 410, h: 276 });
-	    this.drawRectangle(border4, { x: 234, y: 190, w: 332, h: 221 });
-	    this.drawRectangle(border5, { x: 263, y: 208, w: 275, h: 184 });
-	    this.drawRectangle(border6, { x: 283, y: 222, w: 234, h: 157 });
-	    this.drawRectangle(border7, { x: 299, y: 233, w: 202, h: 135 });
-	    this.drawRectangle(border8, { x: 312, y: 240, w: 176, h: 120 });
-	    this.drawRectangle(border9, { x: 322, y: 247, w: 158, h: 106 });
-
-	    let cornerNW = new createjs.Shape();
-	    let cornerNE = new createjs.Shape();
-	    let cornerSE = new createjs.Shape();
-	    let cornerSW = new createjs.Shape();
-
-	    this.drawCorner(cornerNW, { mtx: 88, mty: 91, ltx: 322, lty: 247 });
-	    this.drawCorner(cornerNW, { mtx: 712, mty: 91, ltx: 479, lty: 247 });
-	    this.drawCorner(cornerNW, { mtx: 712, mty: 509, ltx: 479, lty: 353 });
-	    this.drawCorner(cornerNW, { mtx: 88, mty: 509, ltx: 322, lty: 353 });
-
-	    this.stage.update();
-	  }
 
 	  detectHumanHit() {
 	    if (this.humanPaddle.hit(this.ball)) {

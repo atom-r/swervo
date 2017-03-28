@@ -14,28 +14,10 @@ CPU_PADDLE_HEIGHT = 20;
 
 class Corridor {
 
-  constructor(stage, swervo) {
-    this.stage = stage;
-    this.swervo = swervo;
-
-    this.ball = new Ball(this.stage, 60);
-    this.humanPaddle = new Paddle(HUMAN_PADDLE_WIDTH, HUMAN_PADDLE_HEIGHT, HUMAN_COLOR, "near", this.stage)
-    this.cpuPaddle = new Paddle(CPU_PADDLE_WIDTH, CPU_PADDLE_HEIGHT, CPU_COLOR, "far", this.stage)
-
-    this.maxDistance = 60;
-    this.cpuTrackingRatio = 30;
-
-    this.ticker = createjs.Ticker;
-    this.ticker.setFPS(60);
-
-    this.nearHit = new Audio('./audio/nearhit.mp3');
-    this.farHit = new Audio('./audio/farhit.mp3');
-    this.vWallHit = new Audio('./audio/wallhit.mp3');
-    this.hWallHit = new Audio('./audio/wallhit0.mp3');
-    this.goal = new Audio('./audio/goal.mp3');
-
-    this.renderCorridor();
-    this.renderPieces();
+  constructor(w, h, d) {
+    this.width = w;
+    this.height = h;
+    this.depth = d;
   }
 
   detectWallBounce() {
@@ -64,14 +46,7 @@ class Corridor {
     }
   }
 
-  drawRectangle(shape, { x, y, w, h }) {
-    shape.graphics.beginStroke("#FFF8F0");
-    shape.graphics.setStrokeStyle(1);
-    shape.snapToPixel = true;
-    shape.graphics.drawRect(x, y, w, h);
-
-    this.stage.addChild(shape);
-  }
+  
 
   drawCorner(shape, { mtx, mty, ltx, lty }) {
     shape.graphics.beginStroke("#FFF8F0");
@@ -109,39 +84,7 @@ class Corridor {
     this.ticker.addEventListener('tick', this.movePaddles.bind(this));
   }
 
-  renderCorridor() {
-    const border1 = new createjs.Shape();
-    const border2 = new createjs.Shape();
-    const border3 = new createjs.Shape();
-    const border4 = new createjs.Shape();
-    const border5 = new createjs.Shape();
-    const border6 = new createjs.Shape();
-    const border7 = new createjs.Shape();
-    const border8 = new createjs.Shape();
-    const border9 = new createjs.Shape();
 
-    this.drawRectangle(border1, { x: 88, y: 91, w: 624, h: 418 });
-    this.drawRectangle(border2, { x: 146, y: 130, w: 508, h: 340 });
-    this.drawRectangle(border3, { x: 195, y: 162, w: 410, h: 276 });
-    this.drawRectangle(border4, { x: 234, y: 190, w: 332, h: 221 });
-    this.drawRectangle(border5, { x: 263, y: 208, w: 275, h: 184 });
-    this.drawRectangle(border6, { x: 283, y: 222, w: 234, h: 157 });
-    this.drawRectangle(border7, { x: 299, y: 233, w: 202, h: 135 });
-    this.drawRectangle(border8, { x: 312, y: 240, w: 176, h: 120 });
-    this.drawRectangle(border9, { x: 322, y: 247, w: 158, h: 106 });
-
-    let cornerNW = new createjs.Shape();
-    let cornerNE = new createjs.Shape();
-    let cornerSE = new createjs.Shape();
-    let cornerSW = new createjs.Shape();
-
-    this.drawCorner(cornerNW, { mtx: 88, mty: 91, ltx: 322, lty: 247 });
-    this.drawCorner(cornerNW, { mtx: 712, mty: 91, ltx: 479, lty: 247 });
-    this.drawCorner(cornerNW, { mtx: 712, mty: 509, ltx: 479, lty: 353 });
-    this.drawCorner(cornerNW, { mtx: 88, mty: 509, ltx: 322, lty: 353 });
-
-    this.stage.update();
-  }
 
   detectHumanHit() {
     if (this.humanPaddle.hit(this.ball)) {
