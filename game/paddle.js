@@ -67,17 +67,23 @@ class Paddle {
 
   move(ball = null, trackingRatio = null) {
     if (this.type === 'near') {
-      this.moveNearPaddle();
+      this.moveNearPaddle(ball);
     } else {
       this.moveFarPaddle(ball, trackingRatio);
     }
   }
 
-  moveNearPaddle() {
+  moveNearPaddle(ball = null) {
     this.prevX = this.shape.x;
     this.prevY = this.shape.y;
-    this.shape.x = this.stage.mouseX;
-    this.shape.y = this.stage.mouseY;
+
+    if (ball) {
+      this.shape.x = ball.x
+      this.shape.y = ball.y;
+    } else {
+      this.shape.x = this.stage.mouseX;
+      this.shape.y = this.stage.mouseY;
+    }
 
     this.center();
     this.enforceBounds({top: 91, right: 712, bottom: 509, left: 88});

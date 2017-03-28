@@ -206,7 +206,7 @@
 	      this.cpuStrikes = 2;
 	      setTimeout( () => {
 	        this.corridor.ball.maxDistance = Math.floor(this.corridor.ball.maxDistance * 0.95);
-	        this.corridor.max_distance = this.corridor.ball.maxDistance;
+	        this.corridor.maxDistance = this.corridor.ball.maxDistance;
 	      }, 1000);
 	      setTimeout(this.buildCpuStrikes.bind(this), 1000);
 	    }
@@ -223,7 +223,6 @@
 	    }
 	  }
 	}
-
 
 	const init = () => {
 	  const swervo = new Swervo;
@@ -260,7 +259,7 @@
 	    this.humanPaddle = new Paddle(HUMAN_PADDLE_WIDTH, HUMAN_PADDLE_HEIGHT, HUMAN_COLOR, "near", this.stage)
 	    this.cpuPaddle = new Paddle(CPU_PADDLE_WIDTH, CPU_PADDLE_HEIGHT, CPU_COLOR, "far", this.stage)
 
-	    this.max_distance = 60;
+	    this.maxDistance = 60;
 	    this.cpuTrackingRatio = 30;
 
 	    this.ticker = createjs.Ticker;
@@ -293,7 +292,7 @@
 	  }
 
 	  detectGoalOrHit() {
-	    if (this.ball.distance === this.max_distance){
+	    if (this.ball.distance === this.maxDistance){
 	      this.detectCpuHit();
 	      this.ball.direction = "in";
 	    } else if (this.ball.distance === 0){
@@ -420,20 +419,17 @@
 	  updateBallMarker() {
 	    const ballMarker = this.stage.getChildByName('ballMarker');
 
-	    const markerX = 88 + this.ball.distance * (321 - 88) / this.max_distance;
-	    const markerY = 91 + this.ball.distance * (247 - 91) / this.max_distance;
-	    const markerW = 624 - this.ball.distance * (624 - 158) / this.max_distance;
-	    const markerH = 418 - this.ball.distance * (418 - 106) / this.max_distance;
+	    const markerX = 88 + this.ball.distance * (321 - 88) / this.maxDistance;
+	    const markerY = 91 + this.ball.distance * (247 - 91) / this.maxDistance;
+	    const markerW = 624 - this.ball.distance * (624 - 158) / this.maxDistance;
+	    const markerH = 418 - this.ball.distance * (418 - 106) / this.maxDistance;
 
 	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(markerX, markerY, markerW, markerH);
 	  }
 
 
 	  hitBall(e) {
-	    if (this.ball.shape.x - 35 <= this.humanPaddle.shape.x + 120
-	        && this.ball.shape.x + 35 >= this.humanPaddle.shape.x
-	        && this.ball.shape.y - 35 <= this.humanPaddle.shape.y + 60
-	        && this.ball.shape.y + 35 >= this.humanPaddle.shape.y) {
+	    if (this.humanPaddle.hit(this.ball)) {
 	      e.remove();
 	      this.nearHit.load();
 	      this.nearHit.play();
@@ -555,8 +551,8 @@
 	    this.xVelocity = 0;
 	    this.yVelocity = 0;
 
-	    this.xSpin = 0;
-	    this.ySpin = 0;
+	    this.xSpin = 10 * Math.random();
+	    this.ySpin = 10 * Math.random();
 
 	    this.rawX = 400;
 	    this.rawY = 300;
@@ -664,17 +660,23 @@
 
 	  move(ball = null, trackingRatio = null) {
 	    if (this.type === 'near') {
-	      this.moveNearPaddle();
+	      this.moveNearPaddle(ball);
 	    } else {
 	      this.moveFarPaddle(ball, trackingRatio);
 	    }
 	  }
 
-	  moveNearPaddle() {
+	  moveNearPaddle(ball = null) {
 	    this.prevX = this.shape.x;
 	    this.prevY = this.shape.y;
-	    this.shape.x = this.stage.mouseX;
-	    this.shape.y = this.stage.mouseY;
+
+	    if (ball) {
+	      this.shape.x = ball.x
+	      this.shape.y = ball.y;
+	    } else {
+	      this.shape.x = this.stage.mouseX;
+	      this.shape.y = this.stage.mouseY;
+	    }
 
 	    this.center();
 	    this.enforceBounds({top: 91, right: 712, bottom: 509, left: 88});

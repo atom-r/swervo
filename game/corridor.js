@@ -22,7 +22,7 @@ class Corridor {
     this.humanPaddle = new Paddle(HUMAN_PADDLE_WIDTH, HUMAN_PADDLE_HEIGHT, HUMAN_COLOR, "near", this.stage)
     this.cpuPaddle = new Paddle(CPU_PADDLE_WIDTH, CPU_PADDLE_HEIGHT, CPU_COLOR, "far", this.stage)
 
-    this.max_distance = 60;
+    this.maxDistance = 60;
     this.cpuTrackingRatio = 30;
 
     this.ticker = createjs.Ticker;
@@ -55,7 +55,7 @@ class Corridor {
   }
 
   detectGoalOrHit() {
-    if (this.ball.distance === this.max_distance){
+    if (this.ball.distance === this.maxDistance){
       this.detectCpuHit();
       this.ball.direction = "in";
     } else if (this.ball.distance === 0){
@@ -182,20 +182,17 @@ class Corridor {
   updateBallMarker() {
     const ballMarker = this.stage.getChildByName('ballMarker');
 
-    const markerX = 88 + this.ball.distance * (321 - 88) / this.max_distance;
-    const markerY = 91 + this.ball.distance * (247 - 91) / this.max_distance;
-    const markerW = 624 - this.ball.distance * (624 - 158) / this.max_distance;
-    const markerH = 418 - this.ball.distance * (418 - 106) / this.max_distance;
+    const markerX = 88 + this.ball.distance * (321 - 88) / this.maxDistance;
+    const markerY = 91 + this.ball.distance * (247 - 91) / this.maxDistance;
+    const markerW = 624 - this.ball.distance * (624 - 158) / this.maxDistance;
+    const markerH = 418 - this.ball.distance * (418 - 106) / this.maxDistance;
 
     ballMarker.graphics.clear().beginStroke("#009B72").drawRect(markerX, markerY, markerW, markerH);
   }
 
 
   hitBall(e) {
-    if (this.ball.shape.x - 35 <= this.humanPaddle.shape.x + 120
-        && this.ball.shape.x + 35 >= this.humanPaddle.shape.x
-        && this.ball.shape.y - 35 <= this.humanPaddle.shape.y + 60
-        && this.ball.shape.y + 35 >= this.humanPaddle.shape.y) {
+    if (this.humanPaddle.hit(this.ball)) {
       e.remove();
       this.nearHit.load();
       this.nearHit.play();

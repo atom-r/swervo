@@ -82,8 +82,8 @@ class Ball {
     this.xVelocity = 0;
     this.yVelocity = 0;
 
-    this.xSpin = 0;
-    this.ySpin = 0;
+    this.xSpin = 10 * Math.random();
+    this.ySpin = 10 * Math.random();
 
     this.rawX = 400;
     this.rawY = 300;

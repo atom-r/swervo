@@ -160,7 +160,7 @@ class Swervo {
       this.cpuStrikes = 2;
       setTimeout( () => {
         this.corridor.ball.maxDistance = Math.floor(this.corridor.ball.maxDistance * 0.95);
-        this.corridor.max_distance = this.corridor.ball.maxDistance;
+        this.corridor.maxDistance = this.corridor.ball.maxDistance;
       }, 1000);
       setTimeout(this.buildCpuStrikes.bind(this), 1000);
     }
@@ -177,7 +177,6 @@ class Swervo {
     }
   }
 }
-
 
 const init = () => {
   const swervo = new Swervo;
