@@ -51,6 +51,7 @@
 	WIDTH = 700;
 	HEIGHT = 500;
 	DEPTH = 1600;
+	NUM_SEGMENTS = 9;
 
 	NARROWNESS_FACTOR = DEPTH / 400;
 
@@ -70,16 +71,39 @@
 	    this.stage.canvas.style.cursor = "none";
 
 	    this.corridor = new Corridor(WIDTH, HEIGHT, DEPTH);
-	    this.renderCorridor(9);
+	    this.renderCorridor();
 	  }
 
-	  renderCorridor(numRectangles) {
-	    let distance = 0;
-	    for (var i = 0; i <= numRectangles; i++) {
-	      this.drawRectangle(distance);
-	      distance += DEPTH / numRectangles;
-	    }
+	  renderCorridor() {
+	    this.drawRectangles();
+	    this.drawCorners();
 	    this.stage.update()
+	  }
+
+	  drawCorners() {
+	    const coords = this.getCornerCoords();
+	    coords.forEach( coordSet => {
+	      this.drawCorner(coordSet);
+	    });
+	  }
+
+	  drawCorner(coordSet) {
+	    const corner = new createjs.Shape();
+	    corner.graphics.beginStroke("#FFF8F0");
+	    corner.graphics.setStrokeStyle(1);
+	    corner.snapToPixel = true;
+	    corner.graphics.moveTo(coordSet.x, coordSet.y);
+	    corner.graphics.lineTo(coordSet.ltx, coordSet.lty);
+
+	    this.stage.addChild(corner);
+	  }
+
+	  drawRectangles() {
+	    let distance = 0;
+	    for (var i = 0; i <= NUM_SEGMENTS; i++) {
+	      this.drawRectangle(distance);
+	      distance += DEPTH / NUM_SEGMENTS;
+	    }
 	  }
 
 	  drawRectangle(distance) {
@@ -91,6 +115,15 @@
 	    rect.graphics.drawRect(x, y, w, h);
 
 	    this.stage.addChild(rect);
+	  }
+
+	  getCornerCoords() {
+	    const coords = [];
+	    coords.push({ x: NEAR_X, y: NEAR_Y, ltx: FAR_X, lty: FAR_Y });
+	    coords.push({ x: NEAR_X + WIDTH, y: NEAR_Y, ltx: FAR_X + FAR_WIDTH, lty: FAR_Y });
+	    coords.push({ x: NEAR_X + WIDTH, y: NEAR_Y + HEIGHT, ltx: FAR_X + FAR_WIDTH, lty: FAR_Y + FAR_HEIGHT});
+	    coords.push({ x: NEAR_X, y: NEAR_Y + HEIGHT, ltx: FAR_X, lty: FAR_Y + FAR_HEIGHT });
+	    return coords;
 	  }
 
 	  getDimensions(distance) {
