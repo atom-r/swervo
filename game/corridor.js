@@ -51,10 +51,8 @@ class Corridor {
   drawRectangle(distance) {
     const [x, y, w, h] = this.getRect(distance)
     const rect = new createjs.Shape();
-    rect.graphics.beginStroke("#FFF8F0");
-    rect.graphics.setStrokeStyle(1);
+    rect.graphics.beginStroke("#FFF8F0").setStrokeStyle(1).drawRect(x, y, w, h);
     rect.snapToPixel = true;
-    rect.graphics.drawRect(x, y, w, h);
 
     this.stage.addChild(rect);
   }
@@ -68,11 +66,15 @@ class Corridor {
   }
 
   getCornerCoords() {
-    const coords = [];
-    coords.push({ x: this.nearX, y: this.nearY, ltx: this.farX, lty: this.farY });
-    coords.push({ x: this.nearX + this.width, y: this.nearY, ltx: this.farX + this.farWidth, lty: this.farY });
-    coords.push({ x: this.nearX + this.width, y: this.nearY + this.height, ltx: this.farX + this.farWidth, lty: this.farY + this.farHeight});
-    coords.push({ x: this.nearX, y: this.nearY + this.height, ltx: this.farX, lty: this.farY + this.farHeight });
+    const coords = [
+      { x: this.nearX, y: this.nearY, ltx: this.farX, lty: this.farY },
+      { x: this.nearX + this.width, y: this.nearY, ltx: this.farX + this.farWidth, lty: this.farY },
+      { x: this.nearX + this.width,
+        y: this.nearY + this.height,
+        ltx: this.farX + this.farWidth,
+        lty: this.farY + this.farHeight },
+      { x: this.nearX, y: this.nearY + this.height, ltx: this.farX, lty: this.farY + this.farHeight }
+    ];
     return coords;
   }
 
