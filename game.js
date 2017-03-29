@@ -54,21 +54,11 @@
 	DEPTH = 1600;
 	NUM_SEGMENTS = 9;
 
-	NARROWNESS_FACTOR = DEPTH / 400;
-
-	NEAR_X = (800 - WIDTH) / 2;
-	NEAR_Y = (600 - HEIGHT) / 2;
-
-	FAR_HEIGHT = HEIGHT / NARROWNESS_FACTOR;
-	FAR_WIDTH = WIDTH / NARROWNESS_FACTOR;
-
-	FAR_X = (800 - FAR_WIDTH) / 2;
-	FAR_Y = (600 - FAR_HEIGHT) / 2;
-
 	// PADDLE ATTRIBUTES
-	PADDLE_WIDTH = 120;
-	PADDLE_HEIGHT = 80;
+	PADDLE_WIDTH = WIDTH / 5;
+	PADDLE_HEIGHT = HEIGHT / 5;
 	BLUE = "#2176FF";
+	ORANGE = "#F26430";
 
 	class Swervo {
 
@@ -76,80 +66,25 @@
 	    this.stage = this.stage || new createjs.Stage("myCanvas");
 	    this.stage.canvas.style.cursor = "none";
 
-	    this.corridor = new Corridor(WIDTH, HEIGHT, DEPTH);
-	    this.renderCorridor();
-
+	    this.corridor = new Corridor(WIDTH, HEIGHT, DEPTH, NUM_SEGMENTS, this.stage);
 	    this.bluePaddle = new Paddle(this.stage, this.corridor, BLUE, PADDLE_WIDTH, PADDLE_HEIGHT);
+	    this.orangePaddle = new Paddle(this.stage, this.corridor, ORANGE, PADDLE_WIDTH / this.corridor.narrowFactor, PADDLE_HEIGHT / this.corridor.narrowFactor);
 
-	    this.ticker = createjs.Ticker();
+	    this.corridor.render();
+
+	    this.orangePaddle.draw();
+	    this.bluePaddle.draw();
+	    this.ticker = createjs.Ticker;
 	    this.ticker.setFPS(60);
 	    this.ticker.addEventListener('tick', this.handleTick.bind(this))
 	  }
 
 	  handleTick() {
-	    this.bluePaddle.getPos();
+	    this.bluePaddle.move();
+	    this.stage.update();
 	  }
 
-	  renderCorridor() {
-	    this.drawRectangles();
-	    this.drawCorners();
-	    this.stage.update()
-	  }
 
-	  drawCorners() {
-	    const coords = this.getCornerCoords();
-	    coords.forEach( coordSet => {
-	      this.drawCorner(coordSet);
-	    });
-	  }
-
-	  drawCorner(coordSet) {
-	    const corner = new createjs.Shape();
-	    corner.graphics.beginStroke("#FFF8F0");
-	    corner.graphics.setStrokeStyle(1);
-	    corner.snapToPixel = true;
-	    corner.graphics.moveTo(coordSet.x, coordSet.y);
-	    corner.graphics.lineTo(coordSet.ltx, coordSet.lty);
-
-	    this.stage.addChild(corner);
-	  }
-
-	  drawRectangles() {
-	    let distance = 0;
-	    for (var i = 0; i <= NUM_SEGMENTS; i++) {
-	      this.drawRectangle(distance);
-	      distance += DEPTH / NUM_SEGMENTS;
-	    }
-	  }
-
-	  drawRectangle(distance) {
-	    const [x, y, w, h] = this.getDimensions(distance)
-	    const rect = new createjs.Shape();
-	    rect.graphics.beginStroke("#FFF8F0");
-	    rect.graphics.setStrokeStyle(1);
-	    rect.snapToPixel = true;
-	    rect.graphics.drawRect(x, y, w, h);
-
-	    this.stage.addChild(rect);
-	  }
-
-	  getCornerCoords() {
-	    const coords = [];
-	    coords.push({ x: NEAR_X, y: NEAR_Y, ltx: FAR_X, lty: FAR_Y });
-	    coords.push({ x: NEAR_X + WIDTH, y: NEAR_Y, ltx: FAR_X + FAR_WIDTH, lty: FAR_Y });
-	    coords.push({ x: NEAR_X + WIDTH, y: NEAR_Y + HEIGHT, ltx: FAR_X + FAR_WIDTH, lty: FAR_Y + FAR_HEIGHT});
-	    coords.push({ x: NEAR_X, y: NEAR_Y + HEIGHT, ltx: FAR_X, lty: FAR_Y + FAR_HEIGHT });
-	    return coords;
-	  }
-
-	  getDimensions(distance) {
-	    const x = NEAR_X - (NEAR_X - FAR_X) * Math.sqrt(distance) / Math.sqrt(DEPTH);
-	    const y = NEAR_Y - (NEAR_Y - FAR_Y) * Math.sqrt(distance) / Math.sqrt(DEPTH);
-	    const w = (800 - 2 * x);
-	    const h = (600 - 2 * y);
-
-	    return [x, y, w, h];
-	  }
 	}
 
 	const init = () => {
@@ -179,11 +114,91 @@
 
 	class Corridor {
 
-	  constructor(w, h, d) {
+	  constructor(w, h, d, numSegments, stage) {
 	    this.width = w;
 	    this.height = h;
 	    this.depth = d;
+	    this.numSegments = numSegments;
+	    this.stage = stage;
+
+	    this.getDimensions();
 	  }
+
+	  render() {
+	    this.drawRectangles();
+	    this.drawCorners();
+	    this.stage.update()
+	  }
+
+	  drawCorner(coordSet) {
+	    const corner = new createjs.Shape();
+	    corner.graphics.beginStroke("#FFF8F0");
+	    corner.graphics.setStrokeStyle(1);
+	    corner.snapToPixel = true;
+	    corner.graphics.moveTo(coordSet.x, coordSet.y);
+	    corner.graphics.lineTo(coordSet.ltx, coordSet.lty);
+
+	    this.stage.addChild(corner);
+	  }
+
+	  drawCorners() {
+	    const coords = this.getCornerCoords();
+	    coords.forEach( coordSet => {
+	      this.drawCorner(coordSet);
+	    });
+	  }
+
+	  drawRectangle(distance) {
+	    const [x, y, w, h] = this.getRect(distance)
+	    const rect = new createjs.Shape();
+	    rect.graphics.beginStroke("#FFF8F0");
+	    rect.graphics.setStrokeStyle(1);
+	    rect.snapToPixel = true;
+	    rect.graphics.drawRect(x, y, w, h);
+
+	    this.stage.addChild(rect);
+	  }
+
+	  drawRectangles() {
+	    let distance = 0;
+	    for (var i = 0; i <= this.numSegments; i++) {
+	      this.drawRectangle(distance);
+	      distance += this.depth / this.numSegments;
+	    }
+	  }
+
+	  getCornerCoords() {
+	    const coords = [];
+	    coords.push({ x: this.nearX, y: this.nearY, ltx: this.farX, lty: this.farY });
+	    coords.push({ x: this.nearX + this.width, y: this.nearY, ltx: this.farX + this.farWidth, lty: this.farY });
+	    coords.push({ x: this.nearX + this.width, y: this.nearY + this.height, ltx: this.farX + this.farWidth, lty: this.farY + this.farHeight});
+	    coords.push({ x: this.nearX, y: this.nearY + this.height, ltx: this.farX, lty: this.farY + this.farHeight });
+	    return coords;
+	  }
+
+	  getDimensions() {
+	    this.narrowFactor = this.depth / 400;
+
+	    this.nearX = (800 - this.width) / 2;
+	    this.nearY = (600 - this.height) / 2;
+
+	    this.farHeight = this.height / this.narrowFactor;
+	    this.farWidth = this.width / this.narrowFactor;
+
+	    this.farX = (800 - this.farWidth) / 2;
+	    this.farY = (600 - this.farHeight) / 2;
+	  }
+
+	  getRect(distance) {
+	    const x = this.nearX - (this.nearX - this.farX) * Math.sqrt(distance) / Math.sqrt(this.depth);
+	    const y = this.nearY - (this.nearY - this.farY) * Math.sqrt(distance) / Math.sqrt(this.depth);
+	    const w = (800 - 2 * x);
+	    const h = (600 - 2 * y);
+
+	    return [x, y, w, h];
+	  }
+
+	  //===========================================
 
 	  detectWallBounce() {
 	    if(this.ball.rawX >= 712 || this.ball.rawX <= 88){
@@ -444,6 +459,7 @@
 	    this.color = color;
 	    this.corridor = corridor;
 	    this.stage = stage;
+	    this.shape = new createjs.Shape();
 
 	    this.x = 0;
 	    this.y = 0;
@@ -464,7 +480,7 @@
 	  draw() {
 	    let borderRadius;
 	    let strokeStyle;
-	    if (this.type === 'near') {
+	    if (this.color === '#2176FF') {
 	      borderRadius = 10;
 	      strokeStyle = 4;
 	    } else {
@@ -512,11 +528,11 @@
 	  }
 
 	  move(ball = null, trackingRatio = null) {
-	    if (this.type === 'near') {
+	    // if (this.type === 'near') {
 	      this.moveNearPaddle(ball);
-	    } else {
-	      this.moveFarPaddle(ball, trackingRatio);
-	    }
+	    // } else {
+	    //   this.moveFarPaddle(ball, trackingRatio);
+	    // }
 	  }
 
 	  moveNearPaddle(ball = null) {
@@ -532,7 +548,12 @@
 	    }
 
 	    this.center();
-	    this.enforceBounds({top: 91, right: 712, bottom: 509, left: 88});
+	    this.enforceBounds({
+	      top: this.corridor.nearY,
+	      right: this.corridor.nearX + this.corridor.width,
+	      bottom: this.corridor.nearY + this.corridor.height,
+	      left: this.corridor.nearX
+	    });
 	  }
 
 	  moveFarPaddle(ball, trackingRatio) {

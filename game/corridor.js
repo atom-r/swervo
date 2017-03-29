@@ -14,11 +14,91 @@ CPU_PADDLE_HEIGHT = 20;
 
 class Corridor {
 
-  constructor(w, h, d) {
+  constructor(w, h, d, numSegments, stage) {
     this.width = w;
     this.height = h;
     this.depth = d;
+    this.numSegments = numSegments;
+    this.stage = stage;
+
+    this.getDimensions();
   }
+
+  render() {
+    this.drawRectangles();
+    this.drawCorners();
+    this.stage.update()
+  }
+
+  drawCorner(coordSet) {
+    const corner = new createjs.Shape();
+    corner.graphics.beginStroke("#FFF8F0");
+    corner.graphics.setStrokeStyle(1);
+    corner.snapToPixel = true;
+    corner.graphics.moveTo(coordSet.x, coordSet.y);
+    corner.graphics.lineTo(coordSet.ltx, coordSet.lty);
+
+    this.stage.addChild(corner);
+  }
+
+  drawCorners() {
+    const coords = this.getCornerCoords();
+    coords.forEach( coordSet => {
+      this.drawCorner(coordSet);
+    });
+  }
+
+  drawRectangle(distance) {
+    const [x, y, w, h] = this.getRect(distance)
+    const rect = new createjs.Shape();
+    rect.graphics.beginStroke("#FFF8F0");
+    rect.graphics.setStrokeStyle(1);
+    rect.snapToPixel = true;
+    rect.graphics.drawRect(x, y, w, h);
+
+    this.stage.addChild(rect);
+  }
+
+  drawRectangles() {
+    let distance = 0;
+    for (var i = 0; i <= this.numSegments; i++) {
+      this.drawRectangle(distance);
+      distance += this.depth / this.numSegments;
+    }
+  }
+
+  getCornerCoords() {
+    const coords = [];
+    coords.push({ x: this.nearX, y: this.nearY, ltx: this.farX, lty: this.farY });
+    coords.push({ x: this.nearX + this.width, y: this.nearY, ltx: this.farX + this.farWidth, lty: this.farY });
+    coords.push({ x: this.nearX + this.width, y: this.nearY + this.height, ltx: this.farX + this.farWidth, lty: this.farY + this.farHeight});
+    coords.push({ x: this.nearX, y: this.nearY + this.height, ltx: this.farX, lty: this.farY + this.farHeight });
+    return coords;
+  }
+
+  getDimensions() {
+    this.narrowFactor = this.depth / 400;
+
+    this.nearX = (800 - this.width) / 2;
+    this.nearY = (600 - this.height) / 2;
+
+    this.farHeight = this.height / this.narrowFactor;
+    this.farWidth = this.width / this.narrowFactor;
+
+    this.farX = (800 - this.farWidth) / 2;
+    this.farY = (600 - this.farHeight) / 2;
+  }
+
+  getRect(distance) {
+    const x = this.nearX - (this.nearX - this.farX) * Math.sqrt(distance) / Math.sqrt(this.depth);
+    const y = this.nearY - (this.nearY - this.farY) * Math.sqrt(distance) / Math.sqrt(this.depth);
+    const w = (800 - 2 * x);
+    const h = (600 - 2 * y);
+
+    return [x, y, w, h];
+  }
+
+  //===========================================
 
   detectWallBounce() {
     if(this.ball.rawX >= 712 || this.ball.rawX <= 88){

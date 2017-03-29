@@ -6,6 +6,7 @@ class Paddle {
     this.color = color;
     this.corridor = corridor;
     this.stage = stage;
+    this.shape = new createjs.Shape();
 
     this.x = 0;
     this.y = 0;
@@ -26,7 +27,7 @@ class Paddle {
   draw() {
     let borderRadius;
     let strokeStyle;
-    if (this.type === 'near') {
+    if (this.color === '#2176FF') {
       borderRadius = 10;
       strokeStyle = 4;
     } else {
@@ -74,11 +75,11 @@ class Paddle {
   }
 
   move(ball = null, trackingRatio = null) {
-    if (this.type === 'near') {
+    // if (this.type === 'near') {
       this.moveNearPaddle(ball);
-    } else {
-      this.moveFarPaddle(ball, trackingRatio);
-    }
+    // } else {
+    //   this.moveFarPaddle(ball, trackingRatio);
+    // }
   }
 
   moveNearPaddle(ball = null) {
@@ -94,7 +95,12 @@ class Paddle {
     }
 
     this.center();
-    this.enforceBounds({top: 91, right: 712, bottom: 509, left: 88});
+    this.enforceBounds({
+      top: this.corridor.nearY,
+      right: this.corridor.nearX + this.corridor.width,
+      bottom: this.corridor.nearY + this.corridor.height,
+      left: this.corridor.nearX
+    });
   }
 
   moveFarPaddle(ball, trackingRatio) {
