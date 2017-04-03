@@ -2,9 +2,9 @@ INITIAL_RADIUS = 35;
 
 class Ball {
 
-  constructor(stage, maxDistance) {
+  constructor(stage, corridor) {
     this.stage = stage;
-    this.maxDistance = maxDistance;
+    this.maxDistance = corridor;
 
     this.shape = new createjs.Shape();
 
