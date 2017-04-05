@@ -28,6 +28,8 @@ body {
 .title {
   text-align: center;
   font-family: "Audiowide";
+  display: flex;
+  flex-direction: column;
 }
 
 .title h2 {
@@ -36,6 +38,10 @@ body {
 
 .title span {
   font-size: 20px;
+}
+
+.title span:last-of-type {
+  font-size: 14px;
 }
 
 canvas {

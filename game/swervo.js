@@ -23,7 +23,6 @@ class Swervo {
   }
 
   toggleAudio() {
-    console.log('toggled');
     this.corridor.audio = !this.corridor.audio;
   }
 
