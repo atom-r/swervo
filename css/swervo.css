@@ -40,10 +40,6 @@ body {
   font-size: 20px;
 }
 
-.title span:last-of-type {
-  font-size: 14px;
-}
-
 canvas {
   margin-top: 10px;
   width: 800px;
