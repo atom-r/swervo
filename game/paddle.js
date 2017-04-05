@@ -6,6 +6,7 @@ class Paddle {
     this.color = color;
     this.type = type;
     this.stage = stage;
+    this.demo = true;
 
     this.shape = new createjs.Shape();
   }
@@ -65,25 +66,31 @@ class Paddle {
     }
   }
 
-  move(ball = null, trackingRatio = null) {
+  move(ball, trackingRatio = null) {
     if (this.type === 'near') {
-      this.moveNearPaddle(ball);
+      this.demo ? this.moveDemoPaddle(ball) : this.moveNearPaddle();
     } else {
-      this.moveFarPaddle(ball, trackingRatio);
+      this.demo ? this.moveFarPaddle(ball, -4) : this.moveFarPaddle(ball, trackingRatio);
     }
   }
 
-  moveNearPaddle(ball = null) {
+  moveDemoPaddle(ball) {
     this.prevX = this.shape.x;
     this.prevY = this.shape.y;
 
-    if (ball) {
-      this.shape.x = ball.x
-      this.shape.y = ball.y;
-    } else {
-      this.shape.x = this.stage.mouseX;
-      this.shape.y = this.stage.mouseY;
-    }
+    this.shape.x = ball.shape.x;
+    this.shape.y = ball.shape.y;
+
+    this.center();
+    this.enforceBounds({top: 91, right: 712, bottom: 509, left: 88});
+  }
+
+  moveNearPaddle() {
+    this.prevX = this.shape.x;
+    this.prevY = this.shape.y;
+
+    this.shape.x = this.stage.mouseX;
+    this.shape.y = this.stage.mouseY;
 
     this.center();
     this.enforceBounds({top: 91, right: 712, bottom: 509, left: 88});

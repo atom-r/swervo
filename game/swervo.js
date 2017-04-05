@@ -15,11 +15,86 @@ class Swervo {
 
     this.corridor = new Corridor(this.stage, this);
 
+    this.playDemo();
+    this.handleKeydown();
+  }
+
+  playDemo() {
+    this.corridor.ball.xSpin = -20;
+    this.corridor.ball.ySpin = -30;
+    this.corridor.ball.maxDistance = 50;
+    this.corridor.maxDistance = 50;
+    this.corridor.hitBall();
+    this.buildInstructions();
+    this.flashInstructions();
+
+    this.startGame = this.startGame.bind(this);
+    document.addEventListener('mousedown', this.startGame);
+  }
+
+  buildInstructions() {
+    const text = new createjs.Text("DEMO: CLICK TO START", `20px ${FONT}`, "#FA9F42");
+    text.x = 270;
+    text.y = 462;
+    text.textBaseline = "alphabetic";
+    this.instructions = text;
+
+    this.tips = [];
+    this.tips[0] = new createjs.Text("", `20px ${FONT}`, "#721817");
+    this.tips[0].x = 80;
+    this.tips[0].y = 5;
+
+    this.tips[1] = new createjs.Text("CLICK TO SERVE", `20px ${FONT}`, "#721817");
+    this.tips[1].x = 300;
+    this.tips[1].y = 5;
+
+    this.tips[2] = new createjs.Text("CURVE THE BALL WITH YOUR PADDLE", `20px ${FONT}`, "#721817");
+    this.tips[2].x = 180;
+    this.tips[2].y = 30;
+
+    this.tips[3] = new createjs.Text("USE CURVE TO BEAT THE CPU!", `20px ${FONT}`, "#721817");
+    this.tips[3].x = 220;
+    this.tips[3].y = 55;
+
+    this.tips.forEach( (tip, index) => {
+      this.stage.addChild(tip);
+    });
+  }
+
+  flashInstructions() {
+    this.interval = setInterval( () => this.toggleChild(this.instructions), 500);
+  }
+
+  clearInstructions() {
+    clearInterval(this.interval);
+    this.removeChild(this.instructions);
+  }
+
+  removeChild(child) {
+    if (this.stage.contains(child)) {
+      this.stage.removeChild(child);
+    }
+    this.stage.update();
+  }
+
+  toggleChild(child) {
+    if (this.stage.contains(child)) {
+      this.stage.removeChild(child);
+    } else {
+      this.stage.addChild(child);
+    }
+    this.stage.update();
+  }
+
+  startGame() {
+    this.clearInstructions();
     this.buildCpuScore();
     this.buildHumanScore();
     this.printLevel();
-    this.handleKeydown();
-    this.setStage();
+    document.removeEventListener('mousedown', this.startGame);
+    this.corridor.humanPaddle.demo = false;
+    this.corridor.cpuPaddle.demo = false;
+    this.restart();
   }
 
   toggleAudio() {
@@ -128,7 +203,12 @@ class Swervo {
     this.humanStrikes = 5;
     this.level = 1;
 
+    let audio = this.corridor.audio;
+
     this.corridor = new Corridor(this.stage, this);
+    this.corridor.humanPaddle.demo = false;
+    this.corridor.cpuPaddle.demo = false;
+    this.corridor.audio = audio;
 
     this.buildCpuScore();
     this.buildHumanScore();

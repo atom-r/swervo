@@ -28,7 +28,7 @@ class Corridor {
     this.ticker = createjs.Ticker;
     this.ticker.setFPS(60);
 
-    this.audio = true;
+    this.audio = false;
 
     this.nearHit = new Audio('./audio/nearhit.mp3');
     this.farHit = new Audio('./audio/farhit.mp3');
@@ -102,7 +102,7 @@ class Corridor {
   };
 
   movePaddles() {
-    this.humanPaddle.move();
+    this.humanPaddle.move(this.ball);
     this.cpuPaddle.move(this.ball, this.cpuTrackingRatio);
     this.stage.update();
   }
@@ -205,9 +205,9 @@ class Corridor {
   }
 
 
-  hitBall(e) {
+  hitBall(e = null) {
     if (this.humanPaddle.hit(this.ball)) {
-      e.remove();
+      if (e) e.remove();
       if (this.audio) {
         this.nearHit.load();
         this.nearHit.play();

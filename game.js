@@ -61,11 +61,86 @@
 
 	    this.corridor = new Corridor(this.stage, this);
 
+	    this.playDemo();
+	    this.handleKeydown();
+	  }
+
+	  playDemo() {
+	    this.corridor.ball.xSpin = -20;
+	    this.corridor.ball.ySpin = -30;
+	    this.corridor.ball.maxDistance = 50;
+	    this.corridor.maxDistance = 50;
+	    this.corridor.hitBall();
+	    this.buildInstructions();
+	    this.flashInstructions();
+
+	    this.startGame = this.startGame.bind(this);
+	    document.addEventListener('mousedown', this.startGame);
+	  }
+
+	  buildInstructions() {
+	    const text = new createjs.Text("DEMO: CLICK TO START", `20px ${FONT}`, "#FA9F42");
+	    text.x = 270;
+	    text.y = 462;
+	    text.textBaseline = "alphabetic";
+	    this.instructions = text;
+
+	    this.tips = [];
+	    this.tips[0] = new createjs.Text("", `20px ${FONT}`, "#721817");
+	    this.tips[0].x = 80;
+	    this.tips[0].y = 5;
+
+	    this.tips[1] = new createjs.Text("CLICK TO SERVE", `20px ${FONT}`, "#721817");
+	    this.tips[1].x = 300;
+	    this.tips[1].y = 5;
+
+	    this.tips[2] = new createjs.Text("CURVE THE BALL WITH YOUR PADDLE", `20px ${FONT}`, "#721817");
+	    this.tips[2].x = 180;
+	    this.tips[2].y = 30;
+
+	    this.tips[3] = new createjs.Text("USE CURVE TO BEAT THE CPU!", `20px ${FONT}`, "#721817");
+	    this.tips[3].x = 220;
+	    this.tips[3].y = 55;
+
+	    this.tips.forEach( (tip, index) => {
+	      this.stage.addChild(tip);
+	    });
+	  }
+
+	  flashInstructions() {
+	    this.interval = setInterval( () => this.toggleChild(this.instructions), 500);
+	  }
+
+	  clearInstructions() {
+	    clearInterval(this.interval);
+	    this.removeChild(this.instructions);
+	  }
+
+	  removeChild(child) {
+	    if (this.stage.contains(child)) {
+	      this.stage.removeChild(child);
+	    }
+	    this.stage.update();
+	  }
+
+	  toggleChild(child) {
+	    if (this.stage.contains(child)) {
+	      this.stage.removeChild(child);
+	    } else {
+	      this.stage.addChild(child);
+	    }
+	    this.stage.update();
+	  }
+
+	  startGame() {
+	    this.clearInstructions();
 	    this.buildCpuScore();
 	    this.buildHumanScore();
 	    this.printLevel();
-	    this.handleKeydown();
-	    this.setStage();
+	    document.removeEventListener('mousedown', this.startGame);
+	    this.corridor.humanPaddle.demo = false;
+	    this.corridor.cpuPaddle.demo = false;
+	    this.restart();
 	  }
 
 	  toggleAudio() {
@@ -174,7 +249,12 @@
 	    this.humanStrikes = 5;
 	    this.level = 1;
 
+	    let audio = this.corridor.audio;
+
 	    this.corridor = new Corridor(this.stage, this);
+	    this.corridor.humanPaddle.demo = false;
+	    this.corridor.cpuPaddle.demo = false;
+	    this.corridor.audio = audio;
 
 	    this.buildCpuScore();
 	    this.buildHumanScore();
@@ -261,7 +341,7 @@
 	    this.ticker = createjs.Ticker;
 	    this.ticker.setFPS(60);
 
-	    this.audio = true;
+	    this.audio = false;
 
 	    this.nearHit = new Audio('./audio/nearhit.mp3');
 	    this.farHit = new Audio('./audio/farhit.mp3');
@@ -335,7 +415,7 @@
 	  };
 
 	  movePaddles() {
-	    this.humanPaddle.move();
+	    this.humanPaddle.move(this.ball);
 	    this.cpuPaddle.move(this.ball, this.cpuTrackingRatio);
 	    this.stage.update();
 	  }
@@ -438,9 +518,9 @@
 	  }
 
 
-	  hitBall(e) {
+	  hitBall(e = null) {
 	    if (this.humanPaddle.hit(this.ball)) {
-	      e.remove();
+	      if (e) e.remove();
 	      if (this.audio) {
 	        this.nearHit.load();
 	        this.nearHit.play();
@@ -611,6 +691,7 @@
 	    this.color = color;
 	    this.type = type;
 	    this.stage = stage;
+	    this.demo = true;
 
 	    this.shape = new createjs.Shape();
 	  }
@@ -670,25 +751,31 @@
 	    }
 	  }
 
-	  move(ball = null, trackingRatio = null) {
+	  move(ball, trackingRatio = null) {
 	    if (this.type === 'near') {
-	      this.moveNearPaddle(ball);
+	      this.demo ? this.moveDemoPaddle(ball) : this.moveNearPaddle();
 	    } else {
-	      this.moveFarPaddle(ball, trackingRatio);
+	      this.demo ? this.moveFarPaddle(ball, -4) : this.moveFarPaddle(ball, trackingRatio);
 	    }
 	  }
 
-	  moveNearPaddle(ball = null) {
+	  moveDemoPaddle(ball) {
 	    this.prevX = this.shape.x;
 	    this.prevY = this.shape.y;
 
-	    if (ball) {
-	      this.shape.x = ball.x
-	      this.shape.y = ball.y;
-	    } else {
-	      this.shape.x = this.stage.mouseX;
-	      this.shape.y = this.stage.mouseY;
-	    }
+	    this.shape.x = ball.shape.x;
+	    this.shape.y = ball.shape.y;
+
+	    this.center();
+	    this.enforceBounds({top: 91, right: 712, bottom: 509, left: 88});
+	  }
+
+	  moveNearPaddle() {
+	    this.prevX = this.shape.x;
+	    this.prevY = this.shape.y;
+
+	    this.shape.x = this.stage.mouseX;
+	    this.shape.y = this.stage.mouseY;
 
 	    this.center();
 	    this.enforceBounds({top: 91, right: 712, bottom: 509, left: 88});
