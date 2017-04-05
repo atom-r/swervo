@@ -4,8 +4,8 @@ const Paddle = require('./paddle.js')
 CENTER_X = 400;
 CENTER_Y = 300;
 
-HUMAN_COLOR = "#2176FF";
-CPU_COLOR = "#F26430";
+HUMAN_COLOR = "#2B4162";
+CPU_COLOR = "#721817";
 
 HUMAN_PADDLE_WIDTH = 120;
 HUMAN_PADDLE_HEIGHT = 80;
@@ -65,8 +65,8 @@ class Corridor {
   }
 
   drawRectangle(shape, { x, y, w, h }) {
-    shape.graphics.beginStroke("#FFF8F0");
-    shape.graphics.setStrokeStyle(1);
+    shape.graphics.beginStroke("#2B4162");
+    shape.graphics.setStrokeStyle(3);
     shape.snapToPixel = true;
     shape.graphics.drawRect(x, y, w, h);
 
@@ -74,8 +74,8 @@ class Corridor {
   }
 
   drawCorner(shape, { mtx, mty, ltx, lty }) {
-    shape.graphics.beginStroke("#FFF8F0");
-    shape.graphics.setStrokeStyle(1);
+    shape.graphics.beginStroke("#2B4162");
+    shape.graphics.setStrokeStyle(4);
     shape.snapToPixel = true;
     shape.graphics.moveTo(mtx, mty);
     shape.graphics.lineTo(ltx, lty);
@@ -86,8 +86,8 @@ class Corridor {
   drawBallMarker() {
     const ballMarker = new createjs.Shape();
 
-    ballMarker.graphics.beginStroke("#009B72");
-    ballMarker.graphics.setStrokeStyle(1);
+    ballMarker.graphics.beginStroke("#444");
+    ballMarker.graphics.setStrokeStyle(3);
     ballMarker.snapToPixel = true;
     ballMarker.graphics.drawRect(88, 91, 624, 418);
     ballMarker.name = 'ballMarker';
@@ -149,7 +149,7 @@ class Corridor {
       this.nearHit.play();
       this.getSpin();
     } else {
-      this.ball.fillCommand.style = "#F26430";
+      this.ball.fillCommand.style = CPU_COLOR;
       this.goal.load();
       this.goal.play();
       this.ticker.removeAllEventListeners('tick');
@@ -170,7 +170,7 @@ class Corridor {
       this.farHit.load();
       this.farHit.play();
     } else {
-      this.ball.fillCommand.style = "#2176FF";
+      this.ball.fillCommand.style = HUMAN_COLOR;
       this.goal.load();
       this.goal.play();
       this.ticker.removeAllEventListeners('tick');
@@ -187,7 +187,7 @@ class Corridor {
     const markerW = 624 - this.ball.distance * (624 - 158) / this.maxDistance;
     const markerH = 418 - this.ball.distance * (418 - 106) / this.maxDistance;
 
-    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(markerX, markerY, markerW, markerH);
+    ballMarker.graphics.clear().beginStroke("#444").drawRect(markerX, markerY, markerW, markerH);
   }
 
 

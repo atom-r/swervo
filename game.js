@@ -47,6 +47,8 @@
 	const Corridor = __webpack_require__(1)
 	const Ball = __webpack_require__(2)
 
+	FONT = "Audiowide"
+
 	class Swervo {
 
 	  constructor() {
@@ -67,7 +69,7 @@
 	  }
 
 	  buildCpuScore() {
-	    const text = new createjs.Text("CPU", "20px Arial", "#FFF8F0");
+	    const text = new createjs.Text("CPU", `20px ${FONT}`, "#2B4162");
 	    text.x = 100;
 	    text.y = 70;
 	    text.textBaseline = "alphabetic";
@@ -82,14 +84,14 @@
 	    this.cpuStrikeShapes = [];
 	    for (let i = 0; i < this.cpuStrikes; i++) {
 	      this.cpuStrikeShapes[i] = new createjs.Shape();
-	      this.cpuStrikeShapes[i].graphics.beginFill("#F26430").drawCircle((160 + i * 25), 62, 10);
+	      this.cpuStrikeShapes[i].graphics.beginFill("#721817").drawCircle((160 + i * 25), 62, 10);
 
 	      this.stage.addChild(this.cpuStrikeShapes[i]);
 	    }
 	  }
 
 	  buildHumanScore() {
-	    const text = new createjs.Text("Player", "20px Audiowide", "#FFF8F0");
+	    const text = new createjs.Text("Player", `20px ${FONT}`, "#2B4162");
 	    text.x = 650;
 	    text.y = 70;
 	    text.textBaseline = "alphabetic";
@@ -104,7 +106,7 @@
 	    this.humanStrikeShapes = [];
 	    for (let i = 0; i < this.humanStrikes; i++) {
 	      this.humanStrikeShapes[i] = new createjs.Shape();
-	      this.humanStrikeShapes[i].graphics.beginFill("#2176FF").drawCircle((630 - i * 25), 62, 10);
+	      this.humanStrikeShapes[i].graphics.beginFill("#2B4162").drawCircle((630 - i * 25), 62, 10);
 
 	      this.stage.addChild(this.humanStrikeShapes[i]);
 	    }
@@ -116,12 +118,12 @@
 	      .beginFill("#555")
 	      .drawRoundRect(275, 250, 250, 100, 5);
 
-	    const gameOver = new createjs.Text(`Game Over`, "42px Arial", "#FFF");
+	    const gameOver = new createjs.Text(`Game Over`, `42px ${FONT}`, "#FFF");
 	    gameOver.x = 290;
 	    gameOver.y = 315;
 	    gameOver.textBaseline = "alphabetic";
 
-	    const spaceText = new createjs.Text(`Click to restart`, "24px Arial", "#FFF8F0");
+	    const spaceText = new createjs.Text(`Click to restart`, `42px ${FONT}`, "#2B4162");
 	    spaceText.x = 320;
 	    spaceText.y = 570;
 	    spaceText.textBaseline = "alphabetic";
@@ -136,7 +138,7 @@
 	  }
 
 	  printInstructions() {
-	    const text = new createjs.Text("To curve: sweep the paddle over the ball as it hits", "16px Arial", "#FFF8F0");
+	    const text = new createjs.Text("To curve: sweep the paddle over the ball as it hits", `16px ${FONT}`, "#2B4162");
 	    text.x = 230;
 	    text.y = 25;
 	    text.textBaseline = "alphabetic";
@@ -146,7 +148,7 @@
 	  }
 
 	  printLevel() {
-	    const text = new createjs.Text(`Level ${this.level}`, "24px Arial", "#FFF8F0");
+	    const text = new createjs.Text(`Level ${this.level}`, `24px ${FONT}`, "#2B4162");
 	    text.x = 363;
 	    text.y = 540;
 	    text.textBaseline = "alphabetic";
@@ -186,7 +188,7 @@
 	    const ballMarker = this.stage.getChildByName('ballMarker');
 
 	    this.corridor.ball.reset();
-	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(88, 91, 624, 418);
+	    ballMarker.graphics.clear().beginStroke("#444").drawRect(88, 91, 624, 418);
 	    this.stage.on('stagemousedown', this.corridor.hitBall.bind(this.corridor));
 	  }
 
@@ -241,8 +243,8 @@
 	CENTER_X = 400;
 	CENTER_Y = 300;
 
-	HUMAN_COLOR = "#2176FF";
-	CPU_COLOR = "#F26430";
+	HUMAN_COLOR = "#2B4162";
+	CPU_COLOR = "#721817";
 
 	HUMAN_PADDLE_WIDTH = 120;
 	HUMAN_PADDLE_HEIGHT = 80;
@@ -302,8 +304,8 @@
 	  }
 
 	  drawRectangle(shape, { x, y, w, h }) {
-	    shape.graphics.beginStroke("#FFF8F0");
-	    shape.graphics.setStrokeStyle(1);
+	    shape.graphics.beginStroke("#2B4162");
+	    shape.graphics.setStrokeStyle(3);
 	    shape.snapToPixel = true;
 	    shape.graphics.drawRect(x, y, w, h);
 
@@ -311,8 +313,8 @@
 	  }
 
 	  drawCorner(shape, { mtx, mty, ltx, lty }) {
-	    shape.graphics.beginStroke("#FFF8F0");
-	    shape.graphics.setStrokeStyle(1);
+	    shape.graphics.beginStroke("#2B4162");
+	    shape.graphics.setStrokeStyle(4);
 	    shape.snapToPixel = true;
 	    shape.graphics.moveTo(mtx, mty);
 	    shape.graphics.lineTo(ltx, lty);
@@ -323,8 +325,8 @@
 	  drawBallMarker() {
 	    const ballMarker = new createjs.Shape();
 
-	    ballMarker.graphics.beginStroke("#009B72");
-	    ballMarker.graphics.setStrokeStyle(1);
+	    ballMarker.graphics.beginStroke("#444");
+	    ballMarker.graphics.setStrokeStyle(3);
 	    ballMarker.snapToPixel = true;
 	    ballMarker.graphics.drawRect(88, 91, 624, 418);
 	    ballMarker.name = 'ballMarker';
@@ -386,7 +388,7 @@
 	      this.nearHit.play();
 	      this.getSpin();
 	    } else {
-	      this.ball.fillCommand.style = "#F26430";
+	      this.ball.fillCommand.style = CPU_COLOR;
 	      this.goal.load();
 	      this.goal.play();
 	      this.ticker.removeAllEventListeners('tick');
@@ -407,7 +409,7 @@
 	      this.farHit.load();
 	      this.farHit.play();
 	    } else {
-	      this.ball.fillCommand.style = "#2176FF";
+	      this.ball.fillCommand.style = HUMAN_COLOR;
 	      this.goal.load();
 	      this.goal.play();
 	      this.ticker.removeAllEventListeners('tick');
@@ -424,7 +426,7 @@
 	    const markerW = 624 - this.ball.distance * (624 - 158) / this.maxDistance;
 	    const markerH = 418 - this.ball.distance * (418 - 106) / this.maxDistance;
 
-	    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(markerX, markerY, markerW, markerH);
+	    ballMarker.graphics.clear().beginStroke("#444").drawRect(markerX, markerY, markerW, markerH);
 	  }
 
 
@@ -551,8 +553,8 @@
 	    this.xVelocity = 0;
 	    this.yVelocity = 0;
 
-	    this.xSpin = 10 * Math.random();
-	    this.ySpin = 10 * Math.random();
+	    this.xSpin = 5 * (Math.random() - 0.5);
+	    this.ySpin = 5 * (Math.random() - 0.5);
 
 	    this.rawX = 400;
 	    this.rawY = 300;

@@ -1,6 +1,8 @@
 const Corridor = require('./corridor.js')
 const Ball = require('./ball.js')
 
+FONT = "Audiowide"
+
 class Swervo {
 
   constructor() {
@@ -21,7 +23,7 @@ class Swervo {
   }
 
   buildCpuScore() {
-    const text = new createjs.Text("CPU", "20px Arial", "#FFF8F0");
+    const text = new createjs.Text("CPU", `20px ${FONT}`, "#2B4162");
     text.x = 100;
     text.y = 70;
     text.textBaseline = "alphabetic";
@@ -36,14 +38,14 @@ class Swervo {
     this.cpuStrikeShapes = [];
     for (let i = 0; i < this.cpuStrikes; i++) {
       this.cpuStrikeShapes[i] = new createjs.Shape();
-      this.cpuStrikeShapes[i].graphics.beginFill("#F26430").drawCircle((160 + i * 25), 62, 10);
+      this.cpuStrikeShapes[i].graphics.beginFill("#721817").drawCircle((160 + i * 25), 62, 10);
 
       this.stage.addChild(this.cpuStrikeShapes[i]);
     }
   }
 
   buildHumanScore() {
-    const text = new createjs.Text("Player", "20px Audiowide", "#FFF8F0");
+    const text = new createjs.Text("Player", `20px ${FONT}`, "#2B4162");
     text.x = 650;
     text.y = 70;
     text.textBaseline = "alphabetic";
@@ -58,7 +60,7 @@ class Swervo {
     this.humanStrikeShapes = [];
     for (let i = 0; i < this.humanStrikes; i++) {
       this.humanStrikeShapes[i] = new createjs.Shape();
-      this.humanStrikeShapes[i].graphics.beginFill("#2176FF").drawCircle((630 - i * 25), 62, 10);
+      this.humanStrikeShapes[i].graphics.beginFill("#2B4162").drawCircle((630 - i * 25), 62, 10);
 
       this.stage.addChild(this.humanStrikeShapes[i]);
     }
@@ -70,12 +72,12 @@ class Swervo {
       .beginFill("#555")
       .drawRoundRect(275, 250, 250, 100, 5);
 
-    const gameOver = new createjs.Text(`Game Over`, "42px Arial", "#FFF");
+    const gameOver = new createjs.Text(`Game Over`, `42px ${FONT}`, "#FFF");
     gameOver.x = 290;
     gameOver.y = 315;
     gameOver.textBaseline = "alphabetic";
 
-    const spaceText = new createjs.Text(`Click to restart`, "24px Arial", "#FFF8F0");
+    const spaceText = new createjs.Text(`Click to restart`, `42px ${FONT}`, "#2B4162");
     spaceText.x = 320;
     spaceText.y = 570;
     spaceText.textBaseline = "alphabetic";
@@ -90,7 +92,7 @@ class Swervo {
   }
 
   printInstructions() {
-    const text = new createjs.Text("To curve: sweep the paddle over the ball as it hits", "16px Arial", "#FFF8F0");
+    const text = new createjs.Text("To curve: sweep the paddle over the ball as it hits", `16px ${FONT}`, "#2B4162");
     text.x = 230;
     text.y = 25;
     text.textBaseline = "alphabetic";
@@ -100,7 +102,7 @@ class Swervo {
   }
 
   printLevel() {
-    const text = new createjs.Text(`Level ${this.level}`, "24px Arial", "#FFF8F0");
+    const text = new createjs.Text(`Level ${this.level}`, `24px ${FONT}`, "#2B4162");
     text.x = 363;
     text.y = 540;
     text.textBaseline = "alphabetic";
@@ -140,7 +142,7 @@ class Swervo {
     const ballMarker = this.stage.getChildByName('ballMarker');
 
     this.corridor.ball.reset();
-    ballMarker.graphics.clear().beginStroke("#009B72").drawRect(88, 91, 624, 418);
+    ballMarker.graphics.clear().beginStroke("#444").drawRect(88, 91, 624, 418);
     this.stage.on('stagemousedown', this.corridor.hitBall.bind(this.corridor));
   }
 
