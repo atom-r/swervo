@@ -2,7 +2,7 @@
 
 ### Background
 
-![swervo](https://github.com/atom-r/swervo/blob/master/swervo.gif)
+![swervo](https://github.com/atom-r/swervo/blob/master/docs/images/swervo.gif)
 
 [Swervo Live](http://www.adamjrichard.com/swervo)
 

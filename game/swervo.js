@@ -43,7 +43,7 @@ class Swervo {
   }
 
   buildHumanScore() {
-    const text = new createjs.Text("Player", "20px Arial", "#FFF8F0");
+    const text = new createjs.Text("Player", "20px Audiowide", "#FFF8F0");
     text.x = 650;
     text.y = 70;
     text.textBaseline = "alphabetic";
