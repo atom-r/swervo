@@ -17,9 +17,18 @@ class Swervo {
 
     this.buildCpuScore();
     this.buildHumanScore();
-    this.printInstructions();
     this.printLevel();
+    this.handleKeydown();
     this.setStage();
+  }
+
+  toggleAudio() {
+    console.log('toggled');
+    this.corridor.audio = !this.corridor.audio;
+  }
+
+  handleKeydown() {
+    document.addEventListener('keydown', this.toggleAudio.bind(this));
   }
 
   buildCpuScore() {
@@ -91,16 +100,6 @@ class Swervo {
     this.stage.on('mousedown', this.restart.bind(this));
   }
 
-  printInstructions() {
-    const text = new createjs.Text("To curve: sweep the paddle over the ball as it hits", `16px ${FONT}`, "#2B4162");
-    text.x = 230;
-    text.y = 25;
-    text.textBaseline = "alphabetic";
-    text.name = 'instructions';
-
-    this.stage.addChild(text);
-  }
-
   printLevel() {
     const text = new createjs.Text(`Level ${this.level}`, `24px ${FONT}`, "#2B4162");
     text.x = 363;
@@ -154,10 +153,6 @@ class Swervo {
       const level = this.stage.getChildByName('level');
       this.level += 1;
       level.text = `Level ${this.level}`
-      if (this.level === 2) {
-        const instructions = this.stage.getChildByName('instructions');
-        if (instructions) instructions.text = "";
-      }
       this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.4 ;
       this.cpuStrikes = 2;
       setTimeout( () => {

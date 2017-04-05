@@ -28,6 +28,8 @@ class Corridor {
     this.ticker = createjs.Ticker;
     this.ticker.setFPS(60);
 
+    this.audio = true;
+
     this.nearHit = new Audio('./audio/nearhit.mp3');
     this.farHit = new Audio('./audio/farhit.mp3');
     this.vWallHit = new Audio('./audio/wallhit.mp3');
@@ -42,15 +44,19 @@ class Corridor {
     if(this.ball.rawX >= 712 || this.ball.rawX <= 88){
       this.ball.xVelocity = this.ball.xVelocity * -1;
       this.ball.xSpin = 0;
-      this.vWallHit.load();
-      this.vWallHit.play();
+      if (this.audio) {
+        this.vWallHit.load();
+        this.vWallHit.play();
+      }
     }
 
     if(this.ball.rawY >= 509 || this.ball.rawY <= 91){
       this.ball.yVelocity = this.ball.yVelocity * -1;
       this.ball.ySpin = 0;
-      this.hWallHit.load();
-      this.hWallHit.play();
+      if (this.audio) {
+        this.vWallHit.load();
+        this.vWallHit.play();
+      }
     }
   }
 
@@ -145,13 +151,17 @@ class Corridor {
 
   detectHumanHit() {
     if (this.humanPaddle.hit(this.ball)) {
-      this.nearHit.load();
-      this.nearHit.play();
+      if (this.audio) {
+        this.nearHit.load();
+        this.nearHit.play();
+      }
       this.getSpin();
     } else {
       this.ball.fillCommand.style = CPU_COLOR;
-      this.goal.load();
-      this.goal.play();
+      if (this.audio) {
+        this.goal.load();
+        this.goal.play();
+      }
       this.ticker.removeAllEventListeners('tick');
       this.ticker.addEventListener('tick', this.movePaddles.bind(this));
       this.swervo.resetPieces('human');
@@ -167,12 +177,16 @@ class Corridor {
   detectCpuHit() {
     const cpuPaddle = this.stage.getChildByName('cpuPaddle');
     if (this.cpuPaddle.hit(this.ball)) {
-      this.farHit.load();
-      this.farHit.play();
+      if (this.audio) {
+        this.farHit.load();
+        this.farHit.play();
+      }
     } else {
       this.ball.fillCommand.style = HUMAN_COLOR;
-      this.goal.load();
-      this.goal.play();
+      if (this.audio) {
+        this.goal.load();
+        this.goal.play();
+      }
       this.ticker.removeAllEventListeners('tick');
       this.ticker.addEventListener('tick', this.movePaddles.bind(this));
       this.swervo.resetPieces('cpu');
@@ -194,8 +208,10 @@ class Corridor {
   hitBall(e) {
     if (this.humanPaddle.hit(this.ball)) {
       e.remove();
-      this.nearHit.load();
-      this.nearHit.play();
+      if (this.audio) {
+        this.nearHit.load();
+        this.nearHit.play();
+      }
       this.getSpin();
       if (this.ball.xSpin > 15) {
         this.ball.xSpin = 15;

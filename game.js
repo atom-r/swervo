@@ -63,9 +63,18 @@
 
 	    this.buildCpuScore();
 	    this.buildHumanScore();
-	    this.printInstructions();
 	    this.printLevel();
+	    this.handleKeydown();
 	    this.setStage();
+	  }
+
+	  toggleAudio() {
+	    console.log('toggled');
+	    this.corridor.audio = !this.corridor.audio;
+	  }
+
+	  handleKeydown() {
+	    document.addEventListener('keydown', this.toggleAudio.bind(this));
 	  }
 
 	  buildCpuScore() {
@@ -137,16 +146,6 @@
 	    this.stage.on('mousedown', this.restart.bind(this));
 	  }
 
-	  printInstructions() {
-	    const text = new createjs.Text("To curve: sweep the paddle over the ball as it hits", `16px ${FONT}`, "#2B4162");
-	    text.x = 230;
-	    text.y = 25;
-	    text.textBaseline = "alphabetic";
-	    text.name = 'instructions';
-
-	    this.stage.addChild(text);
-	  }
-
 	  printLevel() {
 	    const text = new createjs.Text(`Level ${this.level}`, `24px ${FONT}`, "#2B4162");
 	    text.x = 363;
@@ -200,10 +199,6 @@
 	      const level = this.stage.getChildByName('level');
 	      this.level += 1;
 	      level.text = `Level ${this.level}`
-	      if (this.level === 2) {
-	        const instructions = this.stage.getChildByName('instructions');
-	        if (instructions) instructions.text = "";
-	      }
 	      this.corridor.cpuTrackingRatio = this.corridor.cpuTrackingRatio / 1.4 ;
 	      this.cpuStrikes = 2;
 	      setTimeout( () => {
@@ -267,6 +262,8 @@
 	    this.ticker = createjs.Ticker;
 	    this.ticker.setFPS(60);
 
+	    this.audio = true;
+
 	    this.nearHit = new Audio('./audio/nearhit.mp3');
 	    this.farHit = new Audio('./audio/farhit.mp3');
 	    this.vWallHit = new Audio('./audio/wallhit.mp3');
@@ -281,15 +278,19 @@
 	    if(this.ball.rawX >= 712 || this.ball.rawX <= 88){
 	      this.ball.xVelocity = this.ball.xVelocity * -1;
 	      this.ball.xSpin = 0;
-	      this.vWallHit.load();
-	      this.vWallHit.play();
+	      if (this.audio) {
+	        this.vWallHit.load();
+	        this.vWallHit.play();
+	      }
 	    }
 
 	    if(this.ball.rawY >= 509 || this.ball.rawY <= 91){
 	      this.ball.yVelocity = this.ball.yVelocity * -1;
 	      this.ball.ySpin = 0;
-	      this.hWallHit.load();
-	      this.hWallHit.play();
+	      if (this.audio) {
+	        this.vWallHit.load();
+	        this.vWallHit.play();
+	      }
 	    }
 	  }
 
@@ -384,13 +385,17 @@
 
 	  detectHumanHit() {
 	    if (this.humanPaddle.hit(this.ball)) {
-	      this.nearHit.load();
-	      this.nearHit.play();
+	      if (this.audio) {
+	        this.nearHit.load();
+	        this.nearHit.play();
+	      }
 	      this.getSpin();
 	    } else {
 	      this.ball.fillCommand.style = CPU_COLOR;
-	      this.goal.load();
-	      this.goal.play();
+	      if (this.audio) {
+	        this.goal.load();
+	        this.goal.play();
+	      }
 	      this.ticker.removeAllEventListeners('tick');
 	      this.ticker.addEventListener('tick', this.movePaddles.bind(this));
 	      this.swervo.resetPieces('human');
@@ -406,12 +411,16 @@
 	  detectCpuHit() {
 	    const cpuPaddle = this.stage.getChildByName('cpuPaddle');
 	    if (this.cpuPaddle.hit(this.ball)) {
-	      this.farHit.load();
-	      this.farHit.play();
+	      if (this.audio) {
+	        this.farHit.load();
+	        this.farHit.play();
+	      }
 	    } else {
 	      this.ball.fillCommand.style = HUMAN_COLOR;
-	      this.goal.load();
-	      this.goal.play();
+	      if (this.audio) {
+	        this.goal.load();
+	        this.goal.play();
+	      }
 	      this.ticker.removeAllEventListeners('tick');
 	      this.ticker.addEventListener('tick', this.movePaddles.bind(this));
 	      this.swervo.resetPieces('cpu');
@@ -433,8 +442,10 @@
 	  hitBall(e) {
 	    if (this.humanPaddle.hit(this.ball)) {
 	      e.remove();
-	      this.nearHit.load();
-	      this.nearHit.play();
+	      if (this.audio) {
+	        this.nearHit.load();
+	        this.nearHit.play();
+	      }
 	      this.getSpin();
 	      if (this.ball.xSpin > 15) {
 	        this.ball.xSpin = 15;
