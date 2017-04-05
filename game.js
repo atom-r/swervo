@@ -138,6 +138,7 @@
 	    this.buildHumanScore();
 	    this.printLevel();
 	    document.removeEventListener('mousedown', this.startGame);
+	    this.corridor.audio = true;
 	    this.corridor.humanPaddle.demo = false;
 	    this.corridor.cpuPaddle.demo = false;
 	    this.restart();
