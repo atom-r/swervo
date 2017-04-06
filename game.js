@@ -199,16 +199,16 @@
 	  printGameOver() {
 	    const frame = new createjs.Shape();
 	    frame.graphics
-	      .beginFill("#555")
-	      .drawRoundRect(275, 250, 250, 100, 5);
+	      .beginFill("#2B4162")
+	      .drawRoundRect(255, 250, 290, 100, 5);
 
-	    const gameOver = new createjs.Text(`Game Over`, `42px ${FONT}`, "#FFF");
-	    gameOver.x = 290;
+	    const gameOver = new createjs.Text(`Game Over`, `42px ${FONT}`, "#E0E0E2");
+	    gameOver.x = 275;
 	    gameOver.y = 315;
 	    gameOver.textBaseline = "alphabetic";
 
-	    const spaceText = new createjs.Text(`Click to restart`, `42px ${FONT}`, "#2B4162");
-	    spaceText.x = 320;
+	    const spaceText = new createjs.Text(`Click to restart`, `22px ${FONT}`, "#721817");
+	    spaceText.x = 312;
 	    spaceText.y = 570;
 	    spaceText.textBaseline = "alphabetic";
 
@@ -296,7 +296,7 @@
 	      this.humanStrikes -= 1;
 	      setTimeout(this.setStage.bind(this), 1000);
 	    } else {
-	      this.printGameOver();
+	      setTimeout(this.printGameOver.bind(this), 1000);
 	    }
 	  }
 	}
