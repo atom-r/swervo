@@ -10,6 +10,10 @@ const BallClasses = require('./ball.js');
 const Ball = BallClasses.Ball;
 const BallView = BallClasses.BallView;
 
+const Players = require('./player.js');
+const Human = Players.Human;
+const CPU = Players.CPU;
+
 // CORRIDOR ATTRIBUTES
 const WIDTH = 700;
 const HEIGHT = 500;
@@ -27,10 +31,10 @@ const RADIUS = 35;
 
 class Swervo {
 
-  constructor() {
+  constructor(stage, bluePlayer, redPlayer) {
     this.corridor = new Corridor(WIDTH, HEIGHT, DEPTH);
-    this.bluePaddle = new Paddle(this.corridor, 0);
-    this.redPaddle = new Paddle(this.corridor, DEPTH);
+    this.bluePaddle = new Paddle(this.corridor, bluePlayer, 0);
+    this.redPaddle = new Paddle(this.corridor, redPlayer, DEPTH);
     this.ball = new Ball(this.corridor, RADIUS);
 
     this.blueStrikes = 6;
@@ -40,36 +44,52 @@ class Swervo {
     this.ticker = createjs.Ticker;
     this.ticker.setFPS(60);
 
-    this.swervoView = new SwervoView(this);
+    this.view = new SwervoView(this, stage);
+
+    this.ticker.addEventListener('tick', this.step.bind(this));
+  }
+
+  step() {
+    this.movePaddles();
+    this.view.render();
+  }
+
+  movePaddles() {
+    this.bluePaddle.move();
   }
 
 }
 
 class SwervoView {
-  constructor(swervo) {
-    this.stage = this.stage || new createjs.Stage("myCanvas");
+  constructor(swervo, stage) {
+    this.stage = stage;
     this.stage.canvas.style.cursor = "none";
 
     this.swervo = swervo;
 
-    this.corridorView = new CorridorView(this.swervo.corridor,
+    this.corridor = new CorridorView(this.swervo.corridor,
                                          this.stage,
                                          BLUE);
-                                         
-    this.redPaddleView = new PaddleView(this.swervo.redPaddle,
+
+    this.rPad = new PaddleView(this.swervo.redPaddle,
                                         this.stage,
                                         ORANGE);
 
-    this.ballView = new BallView(this.swervo.ball, this.stage);
+    this.ball = new BallView(this.swervo.ball, this.stage);
 
-    this.bluePaddleView = new PaddleView(this.swervo.bluePaddle,
+    this.bPad = new PaddleView(this.swervo.bluePaddle,
                                          this.stage,
                                          BLUE);
+  }
+
+  render() {
+    this.bPad.render();
   }
 }
 
 const init = () => {
-  const swervo = new Swervo;
+  const stage = new createjs.Stage('myCanvas');
+  const swervo = new Swervo(stage, new Human(stage), new CPU(stage));
 };
 
 document.addEventListener("DOMContentLoaded", init)

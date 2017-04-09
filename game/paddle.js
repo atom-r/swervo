@@ -1,15 +1,24 @@
 class Paddle {
 
-  constructor(corridor, z) {
+  constructor(corridor, player, z) {
+    this.corridor = corridor;
+    this.player = player;
+
     this.w = corridor.w / 5;
     this.h = corridor.h / 5;
-    this.corridor = corridor;
 
     this.x = 0;
     this.y = 0;
     this.z = z;
     this.prevX = 0;
     this.prevY = 0;
+  }
+
+  move() {
+    let x, y;
+    [x, y] = this.player.getPos(this, this.corridor);
+    this.x = x;
+    this.y = y;
   }
 
 }
@@ -59,6 +68,8 @@ class PaddleView {
   }
 
   render() {
+    this.shape.x = this.paddle.x;
+    this.shape.y = this.paddle.y;
     this.stage.update();
   }
 }
