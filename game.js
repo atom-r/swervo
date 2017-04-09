@@ -165,6 +165,17 @@
 	    this.w = width;
 	    this.h = height;
 	    this.d = depth;
+
+	    this.bounds = this.getBounds();
+	  }
+
+	  getBounds() {
+	    return {
+	      l: 400 - this.w / 2,
+	      r: 400 + this.w / 2,
+	      t: 300 - this.h / 2,
+	      b: 300 + this.h / 2
+	    };
 	  }
 
 	}
@@ -568,11 +579,38 @@
 	    this.prevY = 0;
 	  }
 
+	  enforceBounds() {
+	    const bounds = this.corridor.bounds;
+	    if (this.x + this.w / 2 > bounds.r){
+	      this.x = bounds.r - this.w / 2;
+	    } else if (this.x - this.w / 2 < bounds.l){
+	      this.x = bounds.l + this.w / 2;
+	    }
+
+	    if (this.y + this.h / 2 > bounds.b){
+	      this.y = bounds.b - this.h / 2;
+	    } else if (this.y - this.h / 2 < bounds.t){
+	      this.y = bounds.t + this.h / 2;
+	    }
+	  }
+
+	  getBounds() {
+	    debugger
+	    return {
+	      top: this.corridor.nearY,
+	      right: this.corridor.nearX + this.corridor.width,
+	      bottom: this.corridor.nearY + this.corridor.height,
+	      left: this.corridor.nearX
+	    };
+	  }
+
 	  move() {
 	    let x, y;
 	    [x, y] = this.player.getPos(this, this.corridor);
 	    this.x = x;
 	    this.y = y;
+
+	    this.enforceBounds();
 	  }
 
 	}
@@ -587,6 +625,11 @@
 	    this.draw();
 
 	    this.render();
+	  }
+
+	  center() {
+	    this.shape.x -= this.paddle.w / 2;
+	    this.shape.y -= this.paddle.h / 2;
 	  }
 
 	  draw() {
@@ -624,6 +667,7 @@
 	  render() {
 	    this.shape.x = this.paddle.x;
 	    this.shape.y = this.paddle.y;
+	    this.center();
 	    this.stage.update();
 	  }
 	}
@@ -643,19 +687,7 @@
 	//
 	//
 	//
-	//   enforceBounds(bounds) {
-	//     if (this.shape.x + this.width > bounds.right){
-	//       this.shape.x = bounds.right - this.width;
-	//     } else if (this.shape.x < bounds.left){
-	//       this.shape.x = bounds.left;
-	//     }
-	//
-	//     if (this.shape.y + this.height > bounds.bottom){
-	//       this.shape.y = bounds.bottom - this.height;
-	//     } else if (this.shape.y < bounds.top){
-	//       this.shape.y = bounds.top;
-	//     }
-	//   }
+
 	//
 	//   hit(ball) {
 	//     if (ball.shape.x - ball.radius <= this.shape.x + this.width

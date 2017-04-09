@@ -18,6 +18,17 @@ class Corridor {
     this.w = width;
     this.h = height;
     this.d = depth;
+
+    this.bounds = this.getBounds();
+  }
+
+  getBounds() {
+    return {
+      l: 400 - this.w / 2,
+      r: 400 + this.w / 2,
+      t: 300 - this.h / 2,
+      b: 300 + this.h / 2
+    };
   }
 
 }
