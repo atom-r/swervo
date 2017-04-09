@@ -16,27 +16,28 @@ class Paddle {
 
   enforceBounds() {
     const bounds = this.corridor.bounds;
-    if (this.x + this.w / 2 > bounds.r){
+    if (this.x + this.w / 2 > bounds.r) {
       this.x = bounds.r - this.w / 2;
-    } else if (this.x - this.w / 2 < bounds.l){
+    } else if (this.x - this.w / 2 < bounds.l) {
       this.x = bounds.l + this.w / 2;
     }
 
-    if (this.y + this.h / 2 > bounds.b){
+    if (this.y + this.h / 2 > bounds.b) {
       this.y = bounds.b - this.h / 2;
-    } else if (this.y - this.h / 2 < bounds.t){
+    } else if (this.y - this.h / 2 < bounds.t) {
       this.y = bounds.t + this.h / 2;
     }
   }
 
-  getBounds() {
-    debugger
-    return {
-      top: this.corridor.nearY,
-      right: this.corridor.nearX + this.corridor.width,
-      bottom: this.corridor.nearY + this.corridor.height,
-      left: this.corridor.nearX
-    };
+  hit(ball) {
+    if (ball.x - ball.r <= this.x + this.w / 2
+        && ball.x + ball.r >= this.x - this.w / 2
+        && ball.y - ball.r <= this.y + this.h / 2
+        && ball.y + ball.r >= this.y - this.h / 2) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   move() {
@@ -108,32 +109,8 @@ class PaddleView {
 }
 
 
-//   getPos() {
-//     this.x = this.stage.mouseX;
-//     this.y = this.stage.mouseY;
-//
-//     console.log(this.x);
-//   }
-//
-//   center() {
-//     this.shape.x -= this.width / 2;
-//     this.shape.y -= this.height / 2;
-//   }
-//
-//
 //
 
-//
-//   hit(ball) {
-//     if (ball.shape.x - ball.radius <= this.shape.x + this.width
-//         && ball.shape.x + ball.radius >= this.shape.x
-//         && ball.shape.y - ball.radius <= this.shape.y + this.height
-//         && ball.shape.y + ball.radius >= this.shape.y) {
-//       return true;
-//     } else {
-//       return false;
-//     }
-//   }
 //
 //   move(ball = null, trackingRatio = null) {
 //     // if (this.type === 'near') {

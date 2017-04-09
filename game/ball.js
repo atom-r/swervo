@@ -10,9 +10,22 @@ class Ball {
     this.z = 0;
     this.xVel = 0;
     this.yVel = 0;
-    this.zVel = 0;
+    this.zVel = 26;
     this.xSpin = 0;
     this.ySpin = 0;
+  }
+
+  move() {
+    this.x += this.xVel;
+    this.y += this.yVel;
+    this.z += this.zVel;
+
+    console.log(this.z);
+    console.log(this.corridor.d);
+    if (this.z <= 0 || this.z >= this.corridor.d) {
+      debugger
+      this.zVel *= -1;
+    }
   }
 
 }
@@ -39,7 +52,13 @@ class BallView {
     this.stage.addChild(this.shape);
   }
 
+  scaleBall() {
+    this.shape.scaleX = 1 - (3 / 4) * this.ball.z / this.ball.corridor.d;
+    this.shape.scaleY = 1 - (3 / 4) * this.ball.z / this.ball.corridor.d;
+  }
+
   render() {
+    this.scaleBall();
     this.stage.update();
   }
 }
@@ -132,12 +151,7 @@ class BallView {
   //   }
   // }
   //
-  // scaleBall() {
-  //   this.shape.scaleX = 1 - this.distance * 3 / (4 * this.maxDistance);
-  //   this.shape.scaleY = 1 - this.distance * 3 / (4 * this.maxDistance);
   //
-  //   this.radius = 35 * this.shape.scaleX;
-  // }
   //
   // updateDistance() {
   //   if (this.direction === "out"){

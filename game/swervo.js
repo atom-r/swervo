@@ -51,6 +51,7 @@ class Swervo {
 
   step() {
     this.movePaddles();
+    this.ball.move();
     this.view.render();
   }
 
@@ -84,6 +85,7 @@ class SwervoView {
 
   render() {
     this.bPad.render();
+    this.ball.render();
   }
 }
 
