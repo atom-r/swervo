@@ -6,7 +6,9 @@ const PaddleClasses = require('./paddle.js');
 const Paddle = PaddleClasses.Paddle;
 const PaddleView = PaddleClasses.PaddleView;
 
-const Ball = require('./ball.js');
+const BallClasses = require('./ball.js');
+const Ball = BallClasses.Ball;
+const BallView = BallClasses.BallView;
 
 // CORRIDOR ATTRIBUTES
 const WIDTH = 700;
@@ -41,12 +43,6 @@ class Swervo {
     this.swervoView = new SwervoView(this);
   }
 
-  // handleTick() {
-  //   this.bluePaddle.move();
-  //   this.stage.update();
-  // }
-
-
 }
 
 class SwervoView {
@@ -56,9 +52,19 @@ class SwervoView {
 
     this.swervo = swervo;
 
-    this.corridorView = new CorridorView(this.swervo.corridor, this.stage, BLUE);
-    this.redPaddleView = new PaddleView(this.swervo.redPaddle, this.stage, ORANGE);
-    this.bluePaddleView = new PaddleView(this.swervo.bluePaddle, this.stage, BLUE);
+    this.corridorView = new CorridorView(this.swervo.corridor,
+                                         this.stage,
+                                         BLUE);
+                                         
+    this.redPaddleView = new PaddleView(this.swervo.redPaddle,
+                                        this.stage,
+                                        ORANGE);
+
+    this.ballView = new BallView(this.swervo.ball, this.stage);
+
+    this.bluePaddleView = new PaddleView(this.swervo.bluePaddle,
+                                         this.stage,
+                                         BLUE);
   }
 }
 
