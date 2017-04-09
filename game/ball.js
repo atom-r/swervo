@@ -2,13 +2,17 @@ INITIAL_RADIUS = 35;
 
 class Ball {
 
-  constructor(stage, corridor) {
-    this.stage = stage;
-    this.maxDistance = corridor;
-
-    this.shape = new createjs.Shape();
-
-    this.reset();
+  constructor(corridor, radius) {
+    this.corridor = corridor;
+    this.r = radius;
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+    this.xVel = 0;
+    this.yVel = 0;
+    this.zVel = 0;
+    this.xSpin = 0;
+    this.ySpin = 0;
   }
 
   adjustForRadius() {

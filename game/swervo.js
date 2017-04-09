@@ -1,6 +1,12 @@
-const Corridor = require('./corridor.js');
+const CorridorClasses = require('./corridor.js');
+const Corridor = CorridorClasses.Corridor;
+const CorridorView = CorridorClasses.CorridorView;
+
+const PaddleClasses = require('./paddle.js');
+const Paddle = PaddleClasses.Paddle;
+const PaddleView = PaddleClasses.PaddleView;
+
 const Ball = require('./ball.js');
-const Paddle = require('./paddle.js');
 
 // CORRIDOR ATTRIBUTES
 const WIDTH = 700;
@@ -20,50 +26,40 @@ const RADIUS = 35;
 class Swervo {
 
   constructor() {
+    this.corridor = new Corridor(WIDTH, HEIGHT, DEPTH);
+    this.bluePaddle = new Paddle(this.corridor, 0);
+    this.redPaddle = new Paddle(this.corridor, DEPTH);
+    this.ball = new Ball(this.corridor, RADIUS);
+
+    this.blueStrikes = 6;
+    this.redStrikes = 2;
+    this.level = 1;
+
+    this.ticker = createjs.Ticker;
+    this.ticker.setFPS(60);
+
+    this.swervoView = new SwervoView(this);
+  }
+
+  // handleTick() {
+  //   this.bluePaddle.move();
+  //   this.stage.update();
+  // }
+
+
+}
+
+class SwervoView {
+  constructor(swervo) {
     this.stage = this.stage || new createjs.Stage("myCanvas");
     this.stage.canvas.style.cursor = "none";
 
-    this.corridor = new Corridor(
-      WIDTH,
-      HEIGHT,
-      DEPTH,
-      NUM_SEGMENTS,
-      this.stage
-    );
+    this.swervo = swervo;
 
-    this.bluePaddle = new Paddle(
-      this.stage,
-      this.corridor,
-      BLUE,
-      PADDLE_WIDTH,
-      PADDLE_HEIGHT
-    );
-
-    this.orangePaddle = new Paddle(
-      this.stage,
-      this.corridor,
-      ORANGE,
-      PADDLE_WIDTH / this.corridor.narrowFactor,
-      PADDLE_HEIGHT / this.corridor.narrowFactor
-    );
-
-    this.ball = new Ball(this.stage, this.corridor, RADIUS);
-
-    this.corridor.render();
-    this.orangePaddle.draw();
-    this.ball.draw();
-    this.bluePaddle.draw();
-    this.ticker = createjs.Ticker;
-    this.ticker.setFPS(60);
-    this.ticker.addEventListener('tick', this.handleTick.bind(this))
+    this.corridorView = new CorridorView(this.swervo.corridor, this.stage, BLUE);
+    this.redPaddleView = new PaddleView(this.swervo.redPaddle, this.stage, ORANGE);
+    this.bluePaddleView = new PaddleView(this.swervo.bluePaddle, this.stage, BLUE);
   }
-
-  handleTick() {
-    this.bluePaddle.move();
-    this.stage.update();
-  }
-
-
 }
 
 const init = () => {
