@@ -90,3 +90,5 @@ For example, on Level 1, the AI paddle only makes up 1/35 of the distance betwee
 
 ### Going Forward
 Possible future plans for Swervo include PvP support, as well as a mobile implementation.
+
+Currently, I'm performing some major refactoring to clean up the code. As it stands now, I'm mixing up lots of rendering logic and gameplay mechanics. I'd like to separate those things out to make things more readable and modular, now that I've got a working product. I built up lots of technical debt early on, unfortunately, as my early development was mostly concerned with "Can I make this work?" vs. "How do I make this work well."
