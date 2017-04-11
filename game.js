@@ -413,14 +413,26 @@
 	  constructor(corridor, radius) {
 	    this.corridor = corridor;
 	    this.r = radius;
-	    this.x = 0;
-	    this.y = 0;
-	    this.z = 0;
-	    this.xVel = 0;
+	    this.x = 750;
+	    this.y = 300;
+	    this.z = 75;
+	    this.xVel = 5;
 	    this.yVel = 0;
-	    this.zVel = 26;
+	    this.zVel = 10;
 	    this.xSpin = 0;
 	    this.ySpin = 0;
+	  }
+
+	  bounce() {
+	    if (this.x >= this.corridor.bounds.r || this.x <= this.corridor.bounds.l) {
+	      this.xVel *= -1;
+	    }
+	    if (this.y >= this.corridor.bounds.b || this.y <= this.corridor.bounds.t) {
+	      this.yVel *= -1;
+	    }
+	    if (this.z <= 75 || this.z >= this.corridor.d) {
+	      this.zVel *= -1;
+	    }
 	  }
 
 	  move() {
@@ -428,12 +440,7 @@
 	    this.y += this.yVel;
 	    this.z += this.zVel;
 
-	    console.log(this.z);
-	    console.log(this.corridor.d);
-	    if (this.z <= 0 || this.z >= this.corridor.d) {
-	      debugger
-	      this.zVel *= -1;
-	    }
+	    this.bounce();
 	  }
 
 	}
@@ -445,6 +452,15 @@
 	    this.shape = new createjs.Shape();
 
 	    this.draw();
+	  }
+
+	  applyPerspective() {
+	    const distanceFactor = Math.sqrt(this.ball.z / this.ball.corridor.d);
+	    this.farX = (this.ball.x - 400) / 4 + 400;
+	    this.farY = (this.ball.y - 300) / 4 + 300;
+
+	    this.shape.x = this.ball.x - (this.ball.x - this.farX) * distanceFactor;
+	    this.shape.y = this.ball.y - (this.ball.y - this.farY) * distanceFactor;
 	  }
 
 	  draw() {
@@ -466,7 +482,11 @@
 	  }
 
 	  render() {
+	    this.shape.x = this.ball.x;
+	    this.shape.y = this.ball.y;
+
 	    this.scaleBall();
+	    this.applyPerspective();
 	    this.stage.update();
 	  }
 	}
@@ -485,12 +505,7 @@
 	  //   }
 	  // }
 	  //
-	  // applyPerspective() {
-	  //   const distanceFactor = this.distance / this.maxDistance;
 	  //
-	  //   this.shape.x = this.rawX - (this.rawX - this.farX) * distanceFactor;
-	  //   this.shape.y = this.rawY - (this.rawY - this.farY) * distanceFactor;
-	  // }
 	  //
 	  // applySpin() {
 	  //   if (this.direction === "out"){
