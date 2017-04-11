@@ -89,4 +89,4 @@ The AI paddle is set to track the ball's raw position at all times. This is done
 For example, on Level 1, the AI paddle only makes up 1/35 of the distance between it and the ball on every frame. By Level 7, it's making up about 1/8 of that distance per frame.
 
 ### Going Forward
-Swervo stands alone as an entertaining single-player, browser-based game. Possible future plans for Swervo include PvP support, as well as a mobile implementation.
+Possible future plans for Swervo include PvP support, as well as a mobile implementation.
