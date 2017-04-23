@@ -1,4 +1,4 @@
-html, body, div, span, i, h2{
+html, body, div, span, i, h2 {
   margin: 0;
   padding: 0;
   border: 0;
@@ -9,7 +9,7 @@ html, body, div, span, i, h2{
   font-family: "Audiowide";
   vertical-align: baseline;
   color: #E0E0E2;
-  overflow: scroll;
+  overflow: hidden;
   background-color: #2B4162;
 }
 
