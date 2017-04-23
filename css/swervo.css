@@ -16,7 +16,7 @@ html, body, div, span, i, h2 {
 html {
   display: flex;
   justify-content: center;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 body {
